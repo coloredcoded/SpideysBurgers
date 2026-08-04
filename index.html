@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260804-03-eff7a31","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Broken Glyph":"YADZ-exUkv0,0","Canva Sans":"YAFdJjTk5UU,0","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Ghost Mono":"YAHO2EIdDP0,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YADy3sAhvXQ,0","Oleo Script":"YACgEQQ14jI,0","Playfair Display":"YAFdJhem5V8,1","Poppins":"YAE5fPSY9qM,0","Press Start 2P":"YAFyGr-8pmQ,0","Source Sans 3":"YAG4lO1Mj10,0","Space Grotesk":"YAHO2sjPCSM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Trebuchet MS":"YAFcfrglpVA,0","Verdana":"YAGzXTctYtQ,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0"}}');</script>
+    <script src="/_sdk/7949ff62d67710d5.telemetry_sdk.js" integrity="sha512-KIvXA82Di44YY/RH9/63A9MuTuavYgDFG8PfErJn7Wli4K0LAOk+coo/aPXk3+ZNL96nHh9VYD4PE+fLes+laQ=="></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spidey's Burgers</title>
+    
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Oswald', sans-serif; 
+            background-color: #000; 
+            overflow-x: hidden; 
+        }
+        
+        /* Comic Styles */
+        .comic-font { font-family: 'Bangers', cursive; letter-spacing: 1px; }
+        .comic-border { border: 4px solid #000; }
+        .comic-shadow { box-shadow: 8px 8px 0px #000; }
+        .comic-shadow-sm { box-shadow: 4px 4px 0px #000; }
+        
+        .halftone-bg {
+            background-color: #d9dbdd;
+            background-image: radial-gradient(rgba(0,0,0,0.15) 15%, transparent 16%);
+            background-size: 20px 20px;
+        }
+        
+        .action-bg {
+            background-color: #2b4491;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(0,0,0,0.15) 20px, rgba(0,0,0,0.15) 40px);
+        }
+        
+        .skew-box { transform: skewX(-12deg); display: inline-block; }
+        .unskew-text { transform: skewX(12deg); display: block; }
+        
+        .speech-bubble {
+            background: #fff;
+            border-radius: 50% / 30%;
+            border: 5px solid #000;
+            box-shadow: 10px 10px 0 #000;
+            position: relative;
+        }
+
+        .price-burst {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            background: #2b4491;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .price-burst::before, .price-burst::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #2b4491;
+            border: 4px solid #000;
+            z-index: -1;
+        }
+        .price-burst::after { transform: rotate(45deg); }
+        .price-burst-text {
+            position: relative;
+            z-index: 10;
+            font-family: 'Bangers', cursive;
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+        }
+        
+        .comic-btn { transition: all 0.1s; }
+        .comic-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #000 !important; }
+
+        /* FAQ */
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .faq-answer.open { max-height: 200px; border-top: 4px solid #000; }
+        html { scroll-behavior: smooth; }
+    </style>
+
+    <script src="/_sdk/0e8d3a91e1c6f495.data_sdk.js" type="text/javascript" integrity="sha512-c00oDoGjsMgluCLLEyVl3suwEkgjOGGplVFbsilUoBg4aMKNmsL3mwsc9r0dPn95qiSZyjBousQXgROkAW7p/w=="></script>
+    <script src="/_sdk/04cc6185e046f597.resizing_sdk.js" type="text/javascript" integrity="sha512-CiE/G92aQF0nxneFg1kdOvXih8sQ1Z2a2QI3+r/WvzJwQqH6+IyB3iL07OkJmpm3ABAaf07+FnqWny98f5sR6w=="></script>
+</head>
+<body data-template-id="__page-root" class="w-full min-h-screen">
+
+    <!-- Header / Navigation -->
+    <div class="fixed top-0 w-full z-50">
+        <nav data-template-id="nav-bar" class="canva-header w-full bg-white comic-border flex items-center justify-between px-6 py-4 relative z-20">
+            <span data-template-id="nav-logo" class="comic-font text-3xl text-[#e31821] tracking-wider drop-shadow-[2px_2px_0_#000]">Spidey's Burgers🕷️</span> 
+            
+            <button id="mobile-toggle" class="md:hidden text-black focus:outline-none" aria-label="Toggle menu"> 
+                <i data-lucide="menu" style="width:32px;height:32px; stroke-width: 3px;"></i> 
+            </button>
+            
+            <div id="nav-links" class="hidden md:flex gap-8 items-center">
+                <a href="#hero" data-template-id="nav-link-home" class="comic-font text-xl text-black hover:text-[#e31821] transition-colors uppercase flex items-center gap-1">Home <span class="text-[#e31821]">V</span></a> 
+                <a href="#menu" data-template-id="nav-link-menu" class="comic-font text-xl text-black hover:text-[#e31821] transition-colors uppercase flex items-center gap-1">Menu <span class="text-[#e31821]">V</span></a> 
+                <a href="#about" data-template-id="nav-link-about" class="comic-font text-xl text-black hover:text-[#e31821] transition-colors uppercase flex items-center gap-1">About <span class="text-[#e31821]">V</span></a> 
+                <a href="#services" data-template-id="nav-link-services" class="comic-font text-xl text-black hover:text-[#e31821] transition-colors uppercase flex items-center gap-1">Services <span class="text-[#e31821]">V</span></a> 
+                <a href="#faq" data-template-id="nav-link-faq" class="comic-font text-xl text-black hover:text-[#e31821] transition-colors uppercase flex items-center gap-1">FAQ <span class="text-[#e31821]">V</span></a>
+            </div>
+        </nav>
+        <div class="h-6 w-full bg-[#e31821] border-b-4 border-black relative z-10 -mt-1"></div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-[#ffcc00] hidden flex-col items-center justify-center gap-8 comic-border border-8">
+        <a href="#hero" class="comic-font text-black text-5xl hover:text-[#e31821] drop-shadow-[3px_3px_0_#fff]" onclick="closeMobile()">Home</a> 
+        <a href="#menu" class="comic-font text-black text-5xl hover:text-[#e31821] drop-shadow-[3px_3px_0_#fff]" onclick="closeMobile()">Menu</a> 
+        <a href="#about" class="comic-font text-black text-5xl hover:text-[#e31821] drop-shadow-[3px_3px_0_#fff]" onclick="closeMobile()">About</a> 
+        <a href="#services" class="comic-font text-black text-5xl hover:text-[#e31821] drop-shadow-[3px_3px_0_#fff]" onclick="closeMobile()">Services</a> 
+        <a href="#faq" class="comic-font text-black text-5xl hover:text-[#e31821] drop-shadow-[3px_3px_0_#fff]" onclick="closeMobile()">FAQ</a> 
+        <button onclick="closeMobile()" class="absolute top-6 right-6 bg-white comic-border comic-shadow-sm p-2 text-black hover:bg-[#e31821] hover:text-white transition-colors">
+            <i data-lucide="x" style="width:32px;height:32px; stroke-width: 3px;"></i>
+        </button>
+    </div>
+
+    <!-- Hero -->
+    <header id="hero" class="relative w-full min-h-[85vh] action-bg pt-28 pb-16 flex items-center border-b-4 border-black overflow-hidden">
+        <div class="relative z-10 px-4 md:px-16 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+            <div class="speech-bubble p-10 md:p-14 max-w-lg text-center transform -rotate-3 md:flex-1">
+                <p data-template-id="hero-subtitle" class="comic-font text-3xl text-black mb-1">SERIOUSLY</p>
+                <h1 data-template-id="hero-title" class="comic-font text-[#e31821] text-7xl md:text-8xl drop-shadow-[4px_4px_0_#000] leading-none mb-4">EPIC<br><span class="text-black drop-shadow-[3px_3px_0_#fff]">BURGERS</span></h1>
+                <p class="font-bold text-xl text-gray-800 uppercase tracking-wide">With great hunger comes great burgers.</p>
+            </div>
+
+            <div class="relative w-[320px] h-[320px] md:w-[420px] md:h-[420px] shrink-0 flex items-center justify-center order-first md:order-none">
+                <div class="absolute inset-0 bg-[#e31821] comic-border" style="clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);"></div>
+                <img data-template-id="hero-img" class="relative z-10 w-full h-full object-cover rounded-full p-4 drop-shadow-[15px_15px_0_rgba(0,0,0,0.8)]" loading="lazy" src="https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=1280" alt="Juicy cheeseburger">
+            </div>
+
+            <div class="speech-bubble p-8 max-w-sm text-center transform rotate-3 md:flex-1">
+                <h2 class="comic-font text-3xl text-black mb-6">HUNGRY FOR SOMETHING EPIC?</h2>
+                <a href="#menu" data-template-id="hero-cta" class="comic-btn block w-full mb-4 px-6 py-3 bg-[#e31821] text-white comic-border comic-shadow-sm font-bold text-2xl comic-font tracking-wider">
+                    ORDER NOW
+                </a>
+                <a href="#menu" class="comic-btn block w-full px-6 py-3 bg-[#2b4491] text-white comic-border comic-shadow-sm font-bold text-2xl comic-font tracking-wider">
+                    VIEW MENU
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu Section -->
+    <section id="menu" class="halftone-bg w-full py-20 px-4 border-b-4 border-black">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="text-left md:text-center mb-16 ml-4 md:ml-0">
+                <div class="skew-box bg-[#e31821] comic-border comic-shadow px-10 py-3">
+                    <h2 data-template-id="menu-heading" class="unskew-text comic-font text-white text-5xl tracking-widest drop-shadow-[3px_3px_0_#000]">FEATURED BURGERS</h2>
+                </div>
+            </div>
+
+            <!-- Burgers -->
+            <div class="skew-box bg-[#ffcc00] comic-border px-6 py-2 mb-8 ml-4 md:ml-0">
+                <h3 data-template-id="menu-burgers-title" class="unskew-text comic-font text-3xl text-black">🍔 Signature Burgers</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+                <!-- Card 1 -->
+                <div data-template-id="card-classic" class="bg-[#2b4491] p-5 comic-border comic-shadow relative flex flex-col hover:-translate-y-2 transition-transform">
+                    <div class="price-burst"><span data-template-id="card-classic-price" class="price-burst-text">₱249</span></div>
+                    <div class="border-4 border-black bg-white mb-4 h-48 relative overflow-hidden flex items-center justify-center">
+                        <img data-template-id="card-classic-img" class="w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/1108117/pexels-photo-1108117.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Delicious gourmet beef burger">
+                    </div>
+                    <div class="bg-white comic-border p-5 flex-grow flex flex-col items-center text-center">
+                        <h3 data-template-id="card-classic-name" class="comic-font text-3xl text-black mb-2 leading-none">The Classic Web</h3>
+                        <p data-template-id="card-classic-desc" class="text-black font-bold text-sm mb-5 leading-tight">Angus beef, cheddar, crisp lettuce, tomato & Spidey's secret sauce.</p>
+                        <button class="mt-auto comic-btn bg-[#e31821] text-white comic-border comic-shadow-sm px-6 py-2 skew-box w-[90%]">
+                            <span class="unskew-text comic-font text-xl drop-shadow-[2px_2px_0_#000]">ORDER NOW</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div data-template-id="card-spicy" class="bg-[#e31821] p-5 comic-border comic-shadow relative flex flex-col hover:-translate-y-2 transition-transform">
+                    <div class="price-burst" style="background: #1c2b59;"><span data-template-id="card-spicy-price" class="price-burst-text">₱289</span></div>
+                    <div class="border-4 border-black bg-white mb-4 h-48 relative overflow-hidden flex items-center justify-center">
+                        <img data-template-id="card-spicy-img" class="w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/29851906/pexels-photo-29851906.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Grilled chicken burger">
+                    </div>
+                    <div class="bg-white comic-border p-5 flex-grow flex flex-col items-center text-center">
+                        <h3 data-template-id="card-spicy-name" class="comic-font text-3xl text-black mb-2 leading-none">The Venom Bite</h3>
+                        <p data-template-id="card-spicy-desc" class="text-black font-bold text-sm mb-5 leading-tight">Double jalapeños, ghost pepper sauce, pepper jack & habanero crunch.</p>
+                        <button class="mt-auto comic-btn bg-[#ffcc00] text-black comic-border comic-shadow-sm px-6 py-2 skew-box w-[90%]">
+                            <span class="unskew-text comic-font text-xl">ORDER NOW</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div data-template-id="card-deluxe" class="bg-[#2b4491] p-5 comic-border comic-shadow relative flex flex-col hover:-translate-y-2 transition-transform">
+                    <div class="price-burst"><span data-template-id="card-deluxe-price" class="price-burst-text">₱349</span></div>
+                    <div class="border-4 border-black bg-white mb-4 h-48 relative overflow-hidden flex items-center justify-center">
+                        <img data-template-id="card-deluxe-img" class="w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/3915915/pexels-photo-3915915.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Double beef cheeseburger">
+                    </div>
+                    <div class="bg-white comic-border p-5 flex-grow flex flex-col items-center text-center">
+                        <h3 data-template-id="card-deluxe-name" class="comic-font text-3xl text-black mb-2 leading-none">Multiverse Stack</h3>
+                        <p data-template-id="card-deluxe-desc" class="text-black font-bold text-sm mb-5 leading-tight">Double patty, smoked bacon, fried egg, three cheeses & truffle mayo.</p>
+                        <button class="mt-auto comic-btn bg-[#e31821] text-white comic-border comic-shadow-sm px-6 py-2 skew-box w-[90%]">
+                            <span class="unskew-text comic-font text-xl drop-shadow-[2px_2px_0_#000]">ORDER NOW</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sides & More -->
+            <div class="skew-box bg-[#ffcc00] comic-border px-6 py-2 mb-8 ml-4 md:ml-0">
+                <h3 data-template-id="menu-sides-title" class="unskew-text comic-font text-3xl text-black">🍟 Sides & More</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Side 1 -->
+                <div data-template-id="card-fries" class="bg-[#2b4491] p-5 comic-border comic-shadow relative flex flex-col hover:-translate-y-2 transition-transform">
+                    <div class="price-burst"><span data-template-id="card-fries-price" class="price-burst-text">₱99</span></div>
+                    <div class="border-4 border-black bg-white mb-4 h-48 relative overflow-hidden">
+                        <img data-template-id="card-fries-img" class="w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/1583884/pexels-photo-1583884.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Crispy golden french fries">
+                    </div>
+                    <div class="bg-white comic-border p-5 flex-grow flex flex-col items-center text-center">
+                        <h3 data-template-id="card-fries-name" class="comic-font text-3xl text-black mb-2 leading-none">Web-Slinger Fries</h3>
+                        <p data-template-id="card-fries-desc" class="text-black font-bold text-sm mb-5 leading-tight">Crispy golden fries with Spidey's signature spice dust.</p>
+                        <button class="mt-auto comic-btn bg-[#e31821] text-white comic-border comic-shadow-sm px-6 py-2 skew-box w-[90%]">
+                            <span class="unskew-text comic-font text-xl drop-shadow-[2px_2px_0_#000]">ORDER NOW</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Side 2 -->
+                <div data-template-id="card-veggie" class="bg-[#e31821] p-5 comic-border comic-shadow relative flex flex-col hover:-translate-y-2 transition-transform">
+                    <div class="price-burst" style="background: #1c2b59;"><span data-template-id="card-veggie-price" class="price-burst-text">₱229</span></div>
+                    <div class="border-4 border-black bg-white mb-4 h-48 relative overflow-hidden">
+                        <img data-template-id="card-veggie-img" class="w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/6546021/pexels-photo-6546021.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Vegan falafel burger">
+                    </div>
+                    <div class="bg-white comic-border p-5 flex-grow flex flex-col items-center text-center">
+                        <h3 data-template-id="card-veggie-name" class="comic-font text-3xl text-black mb-2 leading-none">The Green Goblin</h3>
+                        <p data-template-id="card-veggie-desc" class="text-black font-bold text-sm mb-5 leading-tight">Plant-based patty, avocado, fresh greens & herb aioli.</p>
+                        <button class="mt-auto comic-btn bg-[#ffcc00] text-black comic-border comic-shadow-sm px-6 py-2 skew-box w-[90%]">
+                            <span class="unskew-text comic-font text-xl">ORDER NOW</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Side 3 -->
+                <div data-template-id="card-kids" class="bg-[#2b4491] p-5 comic-border comic-shadow relative flex flex-col hover:-translate-y-2 transition-transform">
+                    <div class="price-burst"><span data-template-id="card-kids-price" class="price-burst-text">₱179</span></div>
+                    <div class="border-4 border-black bg-white mb-4 h-48 relative overflow-hidden">
+                        <img data-template-id="card-kids-img" class="w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/2725744/pexels-photo-2725744.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Gourmet cheeseburger">
+                    </div>
+                    <div class="bg-white comic-border p-5 flex-grow flex flex-col items-center text-center">
+                        <h3 data-template-id="card-kids-name" class="comic-font text-3xl text-black mb-2 leading-none">Mini Spider Sliders</h3>
+                        <p data-template-id="card-kids-desc" class="text-black font-bold text-sm mb-5 leading-tight">Two mini beef sliders with cheese, served with fries.</p>
+                        <button class="mt-auto comic-btn bg-[#e31821] text-white comic-border comic-shadow-sm px-6 py-2 skew-box w-[90%]">
+                            <span class="unskew-text comic-font text-xl drop-shadow-[2px_2px_0_#000]">ORDER NOW</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us -->
+    <section id="about" class="w-full py-24 px-4 bg-[#ffcc00] border-b-4 border-black">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            <div class="relative">
+                <div class="absolute inset-0 bg-[#e31821] comic-border comic-shadow transform rotate-3 z-0"></div>
+                <img data-template-id="about-img" class="relative z-10 w-full h-96 object-cover comic-border transform -rotate-2" loading="lazy" src="https://images.pexels.com/photos/3217156/pexels-photo-3217156.jpeg?auto=compress&cs=tinysrgb&w=1280" alt="Two chefs in a restaurant kitchen">
+            </div>
+            
+            <div class="bg-white comic-border comic-shadow p-10 transform rotate-1">
+                <div class="skew-box bg-[#e31821] comic-border px-6 py-2 comic-shadow-sm mb-8 inline-block">
+                    <h2 data-template-id="about-heading" class="unskew-text comic-font text-white text-4xl drop-shadow-[2px_2px_0_#000]">ABOUT US</h2>
+                </div>
+                <p data-template-id="about-text-1" class="font-bold text-xl text-black mb-6 leading-relaxed">Born in the heart of Manila, Spidey's Burgers started as a small food stall with one big dream — to serve burgers so good, they'd make your spider-senses tingle. Our crew hand-forms every patty daily using premium Angus beef.</p>
+                <p data-template-id="about-text-2" class="font-medium text-lg text-gray-800 leading-relaxed">We believe great food brings people together. Whether you're swinging by for a quick bite or settling in with friends, our friendly neighborhood joint is here to fuel your adventures.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="action-bg w-full py-24 px-4 border-b-4 border-black">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="skew-box bg-white comic-border px-10 py-3 comic-shadow inline-block">
+                    <h2 data-template-id="services-heading" class="unskew-text comic-font text-black text-5xl">OUR SERVICES</h2>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Service 1 -->
+                <div data-template-id="service-1" class="bg-[#ffcc00] comic-border comic-shadow p-8 text-center transform hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-6 bg-white comic-border rounded-full w-24 h-24 flex items-center justify-center mx-auto comic-shadow-sm">🍔</div>
+                    <h3 data-template-id="service-1-title" class="comic-font text-3xl text-black mb-3">Dine-In</h3>
+                    <p data-template-id="service-1-desc" class="font-bold text-black text-sm">Enjoy our cozy Spider-themed dining area with friends and family.</p>
+                </div>
+                
+                <!-- Service 2 -->
+                <div data-template-id="service-2" class="bg-white comic-border comic-shadow p-8 text-center transform hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-6 bg-[#ffcc00] comic-border rounded-full w-24 h-24 flex items-center justify-center mx-auto comic-shadow-sm">🛵</div>
+                    <h3 data-template-id="service-2-title" class="comic-font text-3xl text-black mb-3">Delivery</h3>
+                    <p data-template-id="service-2-desc" class="font-bold text-black text-sm">Fast delivery within Manila. Hot burgers at your doorstep in 30 mins.</p>
+                </div>
+                
+                <!-- Service 3 -->
+                <div data-template-id="service-3" class="bg-[#e31821] comic-border comic-shadow p-8 text-center transform hover:-translate-y-2 transition-transform text-white">
+                    <div class="text-5xl mb-6 bg-white comic-border rounded-full w-24 h-24 flex items-center justify-center mx-auto comic-shadow-sm">🎉</div>
+                    <h3 data-template-id="service-3-title" class="comic-font text-3xl mb-3 drop-shadow-[2px_2px_0_#000]">Parties</h3>
+                    <p data-template-id="service-3-desc" class="font-bold text-sm">Birthday parties, team events — we bring the burgers and the fun.</p>
+                </div>
+                
+                <!-- Service 4 -->
+                <div data-template-id="service-4" class="bg-white comic-border comic-shadow p-8 text-center transform hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-6 bg-[#2b4491] comic-border rounded-full w-24 h-24 flex items-center justify-center mx-auto comic-shadow-sm text-white">🏢</div>
+                    <h3 data-template-id="service-4-title" class="comic-font text-3xl text-black mb-3">Corporate</h3>
+                    <p data-template-id="service-4-desc" class="font-bold text-black text-sm">Feed your team with bulk orders and custom burger bars for any event.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="halftone-bg w-full py-24 px-4 border-b-4 border-black">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="skew-box bg-[#e31821] comic-border px-10 py-3 comic-shadow inline-block">
+                    <h2 data-template-id="faq-heading" class="unskew-text comic-font text-white text-5xl drop-shadow-[3px_3px_0_#000]">QUESTIONS?</h2>
+                </div>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Q1 -->
+                <div class="faq-item bg-white comic-border comic-shadow-sm group">
+                    <button class="faq-toggle w-full text-left px-8 py-5 flex justify-between items-center hover:bg-[#ffcc00] transition-colors focus:outline-none" aria-expanded="false"> 
+                        <span data-template-id="faq-q1" class="comic-font text-2xl text-black">Are your burgers halal?</span> 
+                        <i data-lucide="chevron-down" style="width:28px;height:28px;color:#000;transition:transform 0.3s; stroke-width: 3px;"></i> 
+                    </button>
+                    <div class="faq-answer bg-gray-50 border-t-0 border-black group-[.open]:border-t-4">
+                        <div class="p-8">
+                            <p data-template-id="faq-a1" class="font-bold text-lg text-black">Yes! All our beef and chicken are sourced from certified halal suppliers.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Q2 -->
+                <div class="faq-item bg-white comic-border comic-shadow-sm group">
+                    <button class="faq-toggle w-full text-left px-8 py-5 flex justify-between items-center hover:bg-[#ffcc00] transition-colors focus:outline-none" aria-expanded="false"> 
+                        <span data-template-id="faq-q2" class="comic-font text-2xl text-black">Do you have vegetarian options?</span> 
+                        <i data-lucide="chevron-down" style="width:28px;height:28px;color:#000;transition:transform 0.3s; stroke-width: 3px;"></i> 
+                    </button>
+                    <div class="faq-answer bg-gray-50 border-t-0 border-black group-[.open]:border-t-4">
+                        <div class="p-8">
+                            <p data-template-id="faq-a2" class="font-bold text-lg text-black">Absolutely. Try our Green Goblin burger — a plant-based patty with avocado and fresh greens.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Q3 -->
+                <div class="faq-item bg-white comic-border comic-shadow-sm group">
+                    <button class="faq-toggle w-full text-left px-8 py-5 flex justify-between items-center hover:bg-[#ffcc00] transition-colors focus:outline-none" aria-expanded="false"> 
+                        <span data-template-id="faq-q3" class="comic-font text-2xl text-black">Can I customize my burger?</span> 
+                        <i data-lucide="chevron-down" style="width:28px;height:28px;color:#000;transition:transform 0.3s; stroke-width: 3px;"></i> 
+                    </button>
+                    <div class="faq-answer bg-gray-50 border-t-0 border-black group-[.open]:border-t-4">
+                        <div class="p-8">
+                            <p data-template-id="faq-a3" class="font-bold text-lg text-black">Of course! Add extra patties, bacon, cheese, or any of our premium toppings for a small upcharge.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Q4 -->
+                <div class="faq-item bg-white comic-border comic-shadow-sm group">
+                    <button class="faq-toggle w-full text-left px-8 py-5 flex justify-between items-center hover:bg-[#ffcc00] transition-colors focus:outline-none" aria-expanded="false"> 
+                        <span data-template-id="faq-q4" class="comic-font text-2xl text-black">Reservations for large groups?</span> 
+                        <i data-lucide="chevron-down" style="width:28px;height:28px;color:#000;transition:transform 0.3s; stroke-width: 3px;"></i> 
+                    </button>
+                    <div class="faq-answer bg-gray-50 border-t-0 border-black group-[.open]:border-t-4">
+                        <div class="p-8">
+                            <p data-template-id="faq-a4" class="font-bold text-lg text-black">Yes, we accept reservations for groups of 10 or more. Just give us a call or message us on social media.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer data-template-id="footer-section" class="w-full py-16 px-4 text-center bg-black relative overflow-hidden">
+        <div class="absolute inset-0 bg-[#e31821] opacity-10" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        
+        <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+            <h2 class="comic-font text-6xl text-white mb-6 drop-shadow-[4px_4px_0_#e31821] tracking-widest">Spidey's Burgers</h2>
+            
+            <div class="bg-white comic-border px-8 py-4 inline-block mb-8 transform -rotate-1">
+                <p data-template-id="footer-hours" class="comic-font text-3xl text-black">OPEN DAILY 11AM – 11PM</p>
+            </div>
+            
+            <p data-template-id="footer-address" class="text-xl text-white font-bold mb-8 uppercase tracking-widest">123 Web Street, Manila, Philippines</p>
+            
+            <p data-template-id="footer-tagline" class="text-sm text-gray-400 font-bold uppercase tracking-widest">© 2026 Spidey's Burgers — Your friendly neighborhood burger joint.</p>
+        </div>
+    </footer>
+
+    <script src="/_sdk/493c75da57365e07.editing_sdk.js" integrity="sha512-bMyHxLnOu1LL6g5gya2Ge0Bke7bi8xHXRZ+rA+qPKo9sdTsnnZEvmhGWtq7tlLKTo/OSolHMUXwm403pFYM4tg=="></script>
+    
+    <script>
+        lucide.createIcons();
+
+        // Mobile menu
+        document.getElementById('mobile-toggle').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.remove('hidden');
+            document.getElementById('mobile-menu').classList.add('flex');
+        });
+        
+        function closeMobile() {
+            document.getElementById('mobile-menu').classList.add('hidden');
+            document.getElementById('mobile-menu').classList.remove('flex');
+        }
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answer = btn.nextElementSibling;
+                const icon = btn.querySelector('[data-lucide]');
+                const isOpen = answer.classList.contains('open');
+                
+                // Close all
+                document.querySelectorAll('.faq-answer').forEach(a => {
+                    a.classList.remove('open');
+                    // Add tailwind class manipulation for border
+                    a.parentElement.classList.remove('group-[.open]');
+                });
+                
+                document.querySelectorAll('.faq-toggle').forEach(b => b.setAttribute('aria-expanded', 'false'));
+                document.querySelectorAll('.faq-toggle svg').forEach(i => i.style.transform = '');
+                
+                if (!isOpen) {
+                    answer.classList.add('open');
+                    // Custom group class implementation for tailwind styling 
+                    answer.parentElement.classList.add('group-[.open]');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.querySelector('svg').style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
