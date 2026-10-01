@@ -1,0 +1,4427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b5ed7">
+<title>FloodLink — Flood Resilience for Small Businesses</title>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+>
+
+<style>
+:root {
+  --navy:#073b73;
+  --blue:#0b5ed7;
+  --sky:#36a9ff;
+  --cyan:#8ee8ff;
+  --ice:#eef8ff;
+  --white:#ffffff;
+  --ink:#10233f;
+  --muted:#62748c;
+  --line:#dbeaf7;
+  --success:#16a673;
+  --warning:#f59e0b;
+  --danger:#e5484d;
+  --purple:#7557d8;
+  --page:#f5fbff;
+  --surface:#ffffff;
+  --surface-2:#fbfdff;
+  --notice:#edf8ff;
+  --notice-text:#07508f;
+  --shadow:0 18px 45px rgba(12,70,130,.12);
+  --radius:22px;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html {
+  scroll-behavior:smooth;
+}
+
+body {
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,
+    BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:var(--page);
+  transition:
+    background .2s ease,
+    color .2s ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+/* =========================
+   APP LAYOUT
+========================= */
+
+.app {
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:250px 1fr;
+}
+
+.sidebar {
+  position:sticky;
+  top:0;
+  height:100vh;
+  padding:24px 16px;
+  background:
+    linear-gradient(
+      180deg,
+      #062f62 0%,
+      #0a4f98 52%,
+      #0b72cf 100%
+    );
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  z-index:1200;
+}
+
+.brand {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:6px 10px 28px;
+}
+
+.brandmark {
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#fff,#9de9ff);
+  display:grid;
+  place-items:center;
+  color:#0b5ed7;
+  font-size:22px;
+  font-weight:900;
+}
+
+.brand h1 {
+  font-size:20px;
+  margin:0;
+}
+
+.brand span {
+  font-size:11px;
+  color:#bfe9ff;
+}
+
+.nav {
+  display:grid;
+  gap:7px;
+}
+
+.nav button {
+  border:0;
+  background:transparent;
+  color:#e9f8ff;
+  text-align:left;
+  padding:12px 13px;
+  border-radius:13px;
+  font-weight:700;
+}
+
+.nav button:hover,
+.nav button.active {
+  background:rgba(255,255,255,.16);
+  color:#fff;
+}
+
+.sidebar-bottom {
+  margin-top:auto;
+}
+
+.mini {
+  font-size:11px;
+  color:#c9edff;
+  line-height:1.5;
+  padding:12px;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.main {
+  min-width:0;
+}
+
+.topbar {
+  height:74px;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  position:sticky;
+  top:0;
+  z-index:900;
+}
+
+.top-actions {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.modebtn,
+.iconbtn {
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  border-radius:12px;
+  padding:9px 12px;
+  font-weight:700;
+}
+
+.modebtn:hover,
+.iconbtn:hover {
+  border-color:#6dbfff;
+}
+
+.avatar {
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--blue),var(--sky));
+  color:#fff;
+  font-weight:800;
+  border:0;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+  padding:28px;
+  max-width:1500px;
+  margin:auto;
+}
+
+.view {
+  display:none;
+}
+
+.view.active {
+  display:block;
+}
+
+.hero {
+  border-radius:28px;
+  padding:28px;
+  color:#fff;
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(255,255,255,.28),
+      transparent 30%
+    ),
+    linear-gradient(
+      120deg,
+      #063a76,
+      #0872d8 58%,
+      #37c8ed
+    );
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+
+.hero:after {
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  right:-100px;
+  bottom:-150px;
+  background:rgba(255,255,255,.12);
+}
+
+.hero h2 {
+  font-size:clamp(25px,3vw,38px);
+  margin:0 0 8px;
+}
+
+.hero p {
+  max-width:700px;
+  color:#e5f7ff;
+  margin:0;
+  line-height:1.6;
+}
+
+.pill {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.15);
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:14px;
+}
+
+.grid {
+  display:grid;
+  gap:16px;
+}
+
+.stats {
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  margin-top:18px;
+}
+
+.card {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:0 10px 28px rgba(11,94,215,.06);
+  padding:20px;
+}
+
+.stat {
+  position:relative;
+  overflow:hidden;
+}
+
+.stat:after {
+  content:"";
+  position:absolute;
+  width:90px;
+  height:90px;
+  right:-25px;
+  top:-25px;
+  background:linear-gradient(135deg,#e5f6ff,#b9e9ff);
+  border-radius:50%;
+}
+
+.stat small {
+  color:var(--muted);
+  font-weight:700;
+}
+
+.stat strong {
+  display:block;
+  font-size:29px;
+  margin-top:5px;
+  color:var(--navy);
+}
+
+.section-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin:26px 0 13px;
+}
+
+.section-head h3,
+.section-head h2 {
+  margin:0;
+}
+
+.sub {
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.two {
+  grid-template-columns:minmax(0,1.5fr) minmax(300px,.7fr);
+}
+
+.three {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn {
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:800;
+  transition:.15s ease;
+}
+
+.btn:hover {
+  transform:translateY(-1px);
+}
+
+.primary {
+  background:linear-gradient(135deg,#0758c9,#0da4e9);
+  color:#fff;
+}
+
+.secondary {
+  background:#eaf5ff;
+  color:#0758c9;
+}
+
+.ghost {
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--ink);
+}
+
+.btn.small {
+  padding:7px 10px;
+  font-size:12px;
+}
+
+/* =========================
+   ALERTS
+========================= */
+
+.alert {
+  display:flex;
+  gap:13px;
+  align-items:flex-start;
+  padding:14px;
+  border-radius:16px;
+  background:#fff5e6;
+  border:1px solid #ffe0ae;
+}
+
+.dot {
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  margin-top:5px;
+  flex:none;
+}
+
+.blue { background:var(--blue); }
+.red { background:var(--danger); }
+.green { background:var(--success); }
+.orange { background:var(--warning); }
+.purple { background:var(--purple); }
+
+/* =========================
+   MAP
+========================= */
+
+.map-shell {
+  overflow:hidden;
+  border-radius:20px;
+  border:1px solid var(--line);
+}
+
+#mapCanvas {
+  height:560px;
+  width:100%;
+}
+
+.map-tools {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.legend {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:12px;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  font-size:12px;
+  font-weight:700;
+}
+
+.legend span {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.legend i {
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  display:inline-block;
+}
+
+.report-placement-banner {
+  display:none;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  border-radius:14px;
+  background:#fff5e6;
+  color:#744500;
+  border:1px solid #ffd58a;
+  font-size:13px;
+  font-weight:700;
+}
+
+.report-placement-banner.active {
+  display:flex;
+}
+
+.report-placement-banner button {
+  margin-left:auto;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+.formgrid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.field {
+  display:grid;
+  gap:6px;
+}
+
+.field.full {
+  grid-column:1/-1;
+}
+
+.field label {
+  font-size:12px;
+  font-weight:800;
+  color:#476078;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  outline:none;
+  background:var(--surface-2);
+  color:var(--ink);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color:#7d91a7;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color:#6dbfff;
+  box-shadow:0 0 0 3px #e1f3ff;
+}
+
+/* =========================
+   NEEDS
+========================= */
+
+.list {
+  display:grid;
+  gap:10px;
+}
+
+.need,
+.person {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--surface);
+}
+
+.need h4,
+.person h4 {
+  margin:0 0 4px;
+}
+
+.need p,
+.person p {
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.tags {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.tag {
+  font-size:11px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#edf7ff;
+  color:#0a5cae;
+  font-weight:800;
+}
+
+.progress {
+  height:9px;
+  border-radius:999px;
+  background:#eaf2f8;
+  overflow:hidden;
+}
+
+.progress b {
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#0b5ed7,#40c9ee);
+}
+
+.notice {
+  padding:12px 14px;
+  border-radius:14px;
+  background:var(--notice);
+  border:1px solid #ccecff;
+  color:var(--notice-text);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.empty {
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+  border:1px dashed #bcd8ed;
+  border-radius:16px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+  position:fixed;
+  inset:0;
+  background:rgba(2,25,53,.62);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:2000;
+  overflow-y:auto;
+}
+
+.modal.open {
+  display:flex;
+}
+
+.modalbox {
+  width:min(560px,100%);
+  max-height:calc(100vh - 36px);
+  overflow:auto;
+  background:var(--surface);
+  color:var(--ink);
+  border-radius:24px;
+  padding:22px;
+  box-shadow:0 30px 90px rgba(0,0,0,.25);
+}
+
+.modalhead {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+
+.modalhead h3 {
+  margin:0;
+}
+
+.close {
+  border:0;
+  background:#eef6ff;
+  color:#164d7d;
+  border-radius:10px;
+  padding:7px 10px;
+  font-weight:800;
+}
+
+.modal-actions {
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-box {
+  width:min(430px,100%);
+}
+
+.login-logo {
+  width:58px;
+  height:58px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#0758c9,#36c8ed);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.login-note {
+  margin-top:14px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.user-menu {
+  position:relative;
+}
+
+.account-panel {
+  position:absolute;
+  right:0;
+  top:46px;
+  width:240px;
+  padding:15px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  display:none;
+  z-index:1500;
+}
+
+.account-panel.open {
+  display:block;
+}
+
+.account-panel strong {
+  display:block;
+  margin-bottom:3px;
+}
+
+.account-panel .sub {
+  margin-bottom:12px;
+}
+
+/* =========================
+   REPORT PLACEMENT
+========================= */
+
+.report-pin-wrapper {
+  position:relative;
+}
+
+.report-pin {
+  width:30px;
+  height:30px;
+  border-radius:50% 50% 50% 0;
+  background:#e5484d;
+  border:3px solid #fff;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+  transform:rotate(-45deg);
+}
+
+.report-pin::after {
+  content:"";
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#fff;
+  top:8px;
+  left:8px;
+}
+
+.report-pin-label {
+  position:absolute;
+  left:20px;
+  top:-14px;
+  transform:rotate(45deg);
+  white-space:nowrap;
+  background:#fff;
+  color:#172b42;
+  border:1px solid #dbeaf7;
+  border-radius:8px;
+  padding:4px 7px;
+  font-size:10px;
+  font-weight:800;
+  box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+/* =========================
+   LEAFLET POPUPS
+========================= */
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background:var(--surface);
+  color:var(--ink);
+}
+
+.leaflet-popup-content {
+  color:var(--ink);
+}
+
+.leaflet-control-zoom a {
+  background:var(--surface) !important;
+  color:var(--ink) !important;
+  border-color:var(--line) !important;
+}
+
+.leaflet-control-attribution {
+  background:rgba(255,255,255,.9) !important;
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+body.dark {
+  --page:#071521;
+  --surface:#0d263d;
+  --surface-2:#102d46;
+  --ink:#f3f9ff;
+  --muted:#bfd0df;
+  --line:#31536d;
+  --notice:#103551;
+  --notice-text:#d8f3ff;
+  background:#071521;
+  color:#f3f9ff;
+}
+
+.dark .topbar {
+  background:rgba(8,27,43,.96);
+  border-color:#31536d;
+}
+
+.dark .topbar strong {
+  color:#fff;
+}
+
+.dark .modebtn,
+.dark .iconbtn {
+  background:#12324d;
+  border-color:#3b617d;
+  color:#fff;
+}
+
+.dark .card,
+.dark .modalbox,
+.dark .need,
+.dark .person {
+  background:#0d263d;
+  color:#f3f9ff;
+  border-color:#31536d;
+}
+
+.dark .stat small,
+.dark .sub {
+  color:#c2d4e3;
+}
+
+.dark .stat strong {
+  color:#fff;
+}
+
+.dark .stat:after {
+  background:#163c5b;
+}
+
+.dark .secondary {
+  background:#16466d;
+  color:#fff;
+}
+
+.dark .ghost {
+  background:#0f2d46;
+  border-color:#3b617d;
+  color:#fff;
+}
+
+.dark .field label {
+  color:#d5e5f2;
+}
+
+.dark .field input,
+.dark .field textarea,
+.dark .field select {
+  background:#102d46;
+  border-color:#3b617d;
+  color:#fff;
+}
+
+.dark .field input::placeholder,
+.dark .field textarea::placeholder {
+  color:#9fb6c9;
+}
+
+.dark .field input:focus,
+.dark .field textarea:focus,
+.dark .field select:focus {
+  border-color:#53b9ff;
+  box-shadow:0 0 0 3px rgba(53,169,255,.18);
+}
+
+.dark .notice {
+  background:#103551;
+  border-color:#285b7a;
+  color:#d8f3ff;
+}
+
+.dark .tag {
+  background:#16476b;
+  color:#e2f5ff;
+}
+
+.dark .progress {
+  background:#1b3b53;
+}
+
+.dark .empty {
+  color:#bfd0df;
+  border-color:#41647d;
+}
+
+.dark .close {
+  background:#163c5a;
+  color:#fff;
+}
+
+.dark .legend {
+  background:#0d263d;
+  color:#fff;
+  border-color:#31536d;
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background:#0d263d;
+  color:#fff;
+}
+
+.dark .leaflet-popup-content {
+  color:#fff;
+}
+
+.dark .leaflet-control-zoom a {
+  background:#0d263d !important;
+  color:#fff !important;
+  border-color:#31536d !important;
+}
+
+.dark .leaflet-control-attribution {
+  background:rgba(13,38,61,.92) !important;
+  color:#d8e7f2 !important;
+}
+
+.dark .leaflet-control-attribution a {
+  color:#74c7ff !important;
+}
+
+.dark .report-placement-banner {
+  background:#4b3210;
+  border-color:#88601b;
+  color:#fff1cf;
+}
+
+.dark .report-pin-label {
+  background:#0d263d;
+  color:#fff;
+  border-color:#31536d;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1000px) {
+  .app {
+    grid-template-columns:82px 1fr;
+  }
+
+  .sidebar {
+    padding:18px 10px;
+  }
+
+  .brand {
+    justify-content:center;
+    padding-bottom:20px;
+  }
+
+  .brand div:last-child,
+  .nav button span,
+  .mini {
+    display:none;
+  }
+
+  .nav button {
+    text-align:center;
+  }
+
+  .stats {
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .two {
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:680px) {
+  .app {
+    display:block;
+  }
+
+  .sidebar {
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    top:auto;
+    height:68px;
+    z-index:1200;
+    padding:7px;
+    background:#073b73;
+  }
+
+  .brand,
+  .sidebar-bottom {
+    display:none;
+  }
+
+  .nav {
+    display:flex;
+    justify-content:space-around;
+  }
+
+  .nav button {
+    padding:9px;
+    font-size:18px;
+  }
+
+  .nav button span {
+    display:none;
+  }
+
+  .topbar {
+    height:64px;
+    padding:0 15px;
+  }
+
+  .content {
+    padding:15px 15px 88px;
+  }
+
+  .stats,
+  .three,
+  .formgrid {
+    grid-template-columns:1fr;
+  }
+
+  .hero {
+    padding:22px;
+  }
+
+  .two {
+    grid-template-columns:1fr;
+  }
+
+  #mapCanvas {
+    height:470px;
+  }
+
+  .map-tools {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .section-head {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .need,
+  .person {
+    flex-direction:column;
+  }
+
+  .field.full {
+    grid-column:auto;
+  }
+
+  .account-panel {
+    right:-4px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- =========================
+       SIDEBAR
+  ========================= -->
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brandmark">≋</div>
+      <div>
+        <h1>FloodLink</h1>
+        <span data-i18n="brandSubtitle">
+          Resilience • Recovery • Community
+        </span>
+      </div>
+    </div>
+
+    <nav class="nav">
+
+      <button class="active" data-view="dashboard">
+        ⌂ <span data-i18n="navDashboard">Dashboard</span>
+      </button>
+
+      <button data-view="map">
+        ◉ <span data-i18n="navMap">Live Map</span>
+      </button>
+
+      <button data-view="needs">
+        ♡ <span data-i18n="navNeeds">Needs Board</span>
+      </button>
+
+      <button data-view="messages">
+        ✉ <span data-i18n="navMessages">Messages</span>
+      </button>
+
+      <button data-view="preparedness">
+        ✓ <span data-i18n="navPreparedness">Preparedness</span>
+      </button>
+
+      <button data-view="profile">
+        ⚙ <span data-i18n="navBusiness">Business</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="mini" data-i18n="emergencySidebar">
+        For emergencies, contact Marikina Rescue 161.
+        FloodLink is a community coordination tool,
+        not a replacement for official emergency services.
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- =========================
+       MAIN
+  ========================= -->
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <strong id="pageTitle">
+        Business Dashboard
+      </strong>
+
+      <div class="top-actions">
+
+        <button class="modebtn" id="langBtn">
+          FIL
+        </button>
+
+        <button class="modebtn" id="darkBtn">
+          ☾
+        </button>
+
+        <div class="user-menu">
+
+          <button
+            class="avatar"
+            id="avatar"
+            aria-label="Account">
+            B
+          </button>
+
+          <div
+            class="account-panel"
+            id="accountPanel">
+
+            <strong id="accountName">
+              Guest
+            </strong>
+
+            <div
+              class="sub"
+              id="accountEmail">
+              Not logged in
+            </div>
+
+            <button
+              class="btn primary"
+              id="accountAction"
+              style="width:100%">
+              Log in
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <div class="content">
+
+      <!-- =========================
+           DASHBOARD
+      ========================= -->
+
+      <section id="dashboard" class="view active">
+
+        <div class="hero">
+
+          <div class="pill">
+            ● <span data-i18n="marikinaFloodwatch">
+              MARIKINA FLOODWATCH
+            </span>
+          </div>
+
+          <h2 data-i18n="heroTitle">
+            Protect your business before the water rises.
+          </h2>
+
+          <p data-i18n="heroText">
+            Track community flood reports, protect inventory,
+            request help, and coordinate recovery from one
+            calm workspace.
+          </p>
+
+          <div style="margin-top:18px;display:flex;gap:9px;flex-wrap:wrap">
+
+            <button
+              class="btn primary"
+              onclick="showView('map')"
+              data-i18n="openLiveMap">
+              Open live map
+            </button>
+
+            <button
+              class="btn secondary"
+              onclick="openModal('needModal')"
+              data-i18n="postNeed">
+              Post a need
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="grid stats">
+
+          <div class="card stat">
+            <small data-i18n="currentReports">
+              Current reports
+            </small>
+            <strong id="reportCount">0</strong>
+            <span class="sub" data-i18n="communityFloodPins">
+              community flood pins
+            </span>
+          </div>
+
+          <div class="card stat">
+            <small data-i18n="openRequests">
+              Open requests
+            </small>
+            <strong id="needCount">0</strong>
+            <span class="sub" data-i18n="needsWaiting">
+              needs waiting for help
+            </span>
+          </div>
+
+          <div class="card stat">
+            <small data-i18n="preparedness">
+              Preparedness
+            </small>
+            <strong id="prepPct">0%</strong>
+            <span class="sub" data-i18n="checklistComplete">
+              checklist complete
+            </span>
+          </div>
+
+          <div class="card stat">
+            <small data-i18n="mapMode">
+              Map mode
+            </small>
+            <strong>LIVE</strong>
+            <span class="sub">
+              OpenStreetMap
+            </span>
+          </div>
+
+        </div>
+
+        <div class="section-head">
+          <div>
+            <h3 data-i18n="situationOverview">
+              Situation overview
+            </h3>
+            <div class="sub" data-i18n="situationSub">
+              Use the map for current community reports;
+              official hazard areas are shown separately.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid two">
+
+          <div class="card">
+
+            <div class="alert">
+
+              <i class="dot orange"></i>
+
+              <div>
+
+                <b data-i18n="twoLayers">
+                  Flood information has two layers
+                </b>
+
+                <div class="sub" data-i18n="twoLayersText">
+                  Orange areas are documented hazard areas.
+                  Red pins are user-submitted observations
+                  and include a timestamp. Treat user reports
+                  as unverified until confirmed.
+                </div>
+
+              </div>
+
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="notice" data-i18n="rescueNotice">
+              Marikina's official emergency service is
+              Rescue 161. Save the number before an emergency.
+            </div>
+
+          </div>
+
+          <div class="card">
+
+            <h3 style="margin-top:0" data-i18n="businessRecovery">
+              Business recovery
+            </h3>
+
+            <div style="display:flex;justify-content:space-between">
+
+              <span class="sub" data-i18n="overallProgress">
+                Overall progress
+              </span>
+
+              <b id="recoveryText">
+                0%
+              </b>
+
+            </div>
+
+            <div
+              class="progress"
+              style="margin:10px 0 14px">
+
+              <b
+                id="recoveryBar"
+                style="width:0%">
+              </b>
+
+            </div>
+
+            <div class="tags">
+              <span class="tag" data-i18n="inventory">Inventory</span>
+              <span class="tag" data-i18n="documents">Documents</span>
+              <span class="tag" data-i18n="staff">Staff</span>
+              <span class="tag" data-i18n="suppliers">Suppliers</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =========================
+           LIVE MAP
+      ========================= -->
+
+      <section id="map" class="view">
+
+        <div class="section-head">
+
+          <div>
+
+            <h2 style="margin:0" data-i18n="marikinaLiveMap">
+              Marikina Live Map
+            </h2>
+
+            <div class="sub" data-i18n="mapInstructions">
+              Start a flood report, then drag the red pin or
+              click the map to position it before confirming.
+              Your business marker can also be moved.
+            </div>
+
+          </div>
+
+          <button
+            class="btn primary"
+            id="startReportBtn">
+            ＋ Report flooding
+          </button>
+
+        </div>
+
+        <div
+          id="reportPlacementBanner"
+          class="report-placement-banner">
+
+          <span>
+            📍 <span data-i18n="moveFloodPin">
+              Move the red flood pin to the exact location.
+            </span>
+          </span>
+
+          <button
+            class="btn ghost small"
+            id="cancelReportPlacement">
+            Cancel
+          </button>
+
+        </div>
+
+        <div class="card" style="padding:10px">
+
+          <div class="map-tools">
+
+            <button
+              class="btn secondary small"
+              onclick="locateBusiness()">
+              ◎ <span data-i18n="myBusiness">My business</span>
+            </button>
+
+            <button
+              class="btn secondary small"
+              onclick="fitMarikina()">
+              ⌖ <span data-i18n="marikina">Marikina</span>
+            </button>
+
+            <button
+              class="btn ghost small"
+              onclick="clearMyReports()"
+              data-i18n="clearReports">
+              Clear my demo reports
+            </button>
+
+          </div>
+
+          <div class="legend">
+
+            <span>
+              <i style="background:#e5484d"></i>
+              <span data-i18n="communityReport">
+                Community flood report
+              </span>
+            </span>
+
+            <span>
+              <i style="background:#f59e0b"></i>
+              <span data-i18n="hazardArea">
+                Documented hazard area
+              </span>
+            </span>
+
+            <span>
+              <i style="background:#16a673"></i>
+              <span data-i18n="shelter">
+                Verified/open shelter
+              </span>
+            </span>
+
+            <span>
+              <i style="background:#0b5ed7"></i>
+              <span data-i18n="business">
+                Business
+              </span>
+            </span>
+
+            <span>
+              <i style="background:#7557d8"></i>
+              <span data-i18n="resources">
+                Resources
+              </span>
+            </span>
+
+          </div>
+
+          <div id="mapCanvas"></div>
+
+        </div>
+
+        <div
+          class="notice"
+          style="margin-top:12px"
+          data-i18n="mapNotice">
+          Map tiles are live from OpenStreetMap.
+          Flood reports created in this demo are saved
+          on this device. For true cross-device live sharing,
+          connect a shared database such as Supabase or Firebase.
+        </div>
+
+      </section>
+
+      <!-- =========================
+           NEEDS BOARD
+      ========================= -->
+
+      <section id="needs" class="view">
+
+        <div class="section-head">
+
+          <div>
+
+            <h2 style="margin:0" data-i18n="needsTitle">
+              Community Needs Board
+            </h2>
+
+            <div class="sub" data-i18n="needsSub">
+              Requests are visible locally in this prototype.
+              A shared backend is required for other users
+              to see them across devices.
+            </div>
+
+          </div>
+
+          <button
+            class="btn primary"
+            onclick="openModal('needModal')"
+            data-i18n="postNeed">
+            ＋ Post a need
+          </button>
+
+        </div>
+
+        <div id="needsList" class="list"></div>
+
+      </section>
+
+      <!-- =========================
+           MESSAGES
+      ========================= -->
+
+      <section id="messages" class="view">
+
+        <div class="section-head">
+
+          <div>
+
+            <h2 style="margin:0" data-i18n="messagesTitle">
+              Direct Messages
+            </h2>
+
+            <div class="sub" data-i18n="messagesSub">
+              Coordinate privately about specific
+              requests or offers.
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="grid two">
+
+          <div class="card">
+
+            <h3 style="margin-top:0" data-i18n="conversations">
+              Conversations
+            </h3>
+
+            <div id="messageList" class="list"></div>
+
+          </div>
+
+          <div class="card">
+
+            <h3 style="margin-top:0" data-i18n="sendMessage">
+              Send a message
+            </h3>
+
+            <form
+              action="https://formsubmit.co/f4c83a93b5f6007e5055d309794dd995"
+              method="POST"
+              target="_blank">
+
+              <input
+                type="hidden"
+                name="_subject"
+                value="FloodLink Direct Message">
+
+              <input
+                type="hidden"
+                name="_captcha"
+                value="false">
+
+              <input
+                type="hidden"
+                name="_template"
+                value="table">
+
+              <div class="formgrid">
+
+                <div class="field">
+                  <label data-i18n="yourName">
+                    Your name
+                  </label>
+
+                  <input
+                    name="name"
+                    required>
+                </div>
+
+                <div class="field">
+                  <label data-i18n="yourEmail">
+                    Your email
+                  </label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    required>
+                </div>
+
+                <div class="field full">
+                  <label data-i18n="recipient">
+                    Who are you contacting?
+                  </label>
+
+                  <input
+                    name="recipient"
+                    placeholder="Name or request ID"
+                    required>
+                </div>
+
+                <div class="field full">
+                  <label data-i18n="message">
+                    Message
+                  </label>
+
+                  <textarea
+                    name="message"
+                    rows="6"
+                    required></textarea>
+                </div>
+
+                <div class="field full">
+                  <button class="btn primary" data-i18n="sendByEmail">
+                    Send securely by email
+                  </button>
+                </div>
+
+              </div>
+
+            </form>
+
+            <div
+              class="notice"
+              style="margin-top:12px">
+
+              Messages are routed to
+              <b>floodlinked@gmail.com</b>
+              through FormSubmit.
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =========================
+           PREPAREDNESS
+      ========================= -->
+
+      <section id="preparedness" class="view">
+
+        <div class="section-head">
+
+          <div>
+
+            <h2 style="margin:0" data-i18n="preparednessTitle">
+              Preparedness Checklist
+            </h2>
+
+            <div class="sub" data-i18n="preparednessSub">
+              Saved locally so the checklist remains
+              available offline.
+            </div>
+
+          </div>
+
+        </div>
+
+        <div id="checklist" class="grid three"></div>
+
+      </section>
+
+      <!-- =========================
+           BUSINESS PROFILE
+      ========================= -->
+
+      <section id="profile" class="view">
+
+        <div class="section-head">
+
+          <div>
+
+            <h2 style="margin:0" data-i18n="profileTitle">
+              Business Profile
+            </h2>
+
+            <div class="sub" data-i18n="profileSub">
+              Your business marker is placed from
+              these coordinates.
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="grid two">
+
+          <div class="card">
+
+            <form id="profileForm">
+
+              <div class="formgrid">
+
+                <div class="field">
+
+                  <label data-i18n="businessName">
+                    Business name
+                  </label>
+
+                  <input id="bizName" required>
+
+                </div>
+
+                <div class="field">
+
+                  <label data-i18n="ownerName">
+                    Owner/contact name
+                  </label>
+
+                  <input id="ownerName">
+
+                </div>
+
+                <div class="field full">
+
+                  <label data-i18n="businessAddress">
+                    Business address
+                  </label>
+
+                  <input
+                    id="bizAddress"
+                    placeholder="Street / barangay / Marikina">
+
+                </div>
+
+                <div class="field">
+
+                  <label data-i18n="latitude">
+                    Latitude
+                  </label>
+
+                  <input
+                    id="bizLat"
+                    type="number"
+                    step="0.000001">
+
+                </div>
+
+                <div class="field">
+
+                  <label data-i18n="longitude">
+                    Longitude
+                  </label>
+
+                  <input
+                    id="bizLng"
+                    type="number"
+                    step="0.000001">
+
+                </div>
+
+                <div class="field full">
+
+                  <button
+                    class="btn primary"
+                    data-i18n="saveLocation">
+                    Save business location
+                  </button>
+
+                </div>
+
+              </div>
+
+            </form>
+
+          </div>
+
+          <div class="card">
+
+            <h3
+              style="margin-top:0"
+              data-i18n="emergencyCard">
+              Emergency card
+            </h3>
+
+            <div class="notice">
+
+              <b>Marikina Rescue 161</b>
+
+              <br>
+
+              Emergency hotline: <b>161</b>
+
+              <br><br>
+
+              <span data-i18n="emergencyInstructions">
+                Always follow official instructions
+                during an active emergency.
+              </span>
+
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="notice" data-i18n="shelterNotice">
+              FloodLink does not label a shelter
+              as “open” unless it has been verified.
+              Shelter status can change quickly.
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- =========================
+     FLOOD REPORT MODAL
+========================= -->
+
+<div class="modal" id="reportModal">
+
+  <div class="modalbox">
+
+    <div class="modalhead">
+
+      <h3 data-i18n="reportFlooding">
+        Report flooding
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('reportModal')">
+        ✕
+      </button>
+
+    </div>
+
+    <p class="sub" data-i18n="reportModalText">
+      The red marker has been placed on the map.
+      Drag it or click another location on the map
+      to move it before confirming the report.
+    </p>
+
+    <div
+      class="notice"
+      style="margin:12px 0"
+      id="selectedLocationText">
+      Location not selected yet.
+    </div>
+
+    <form id="reportForm">
+
+      <div class="formgrid">
+
+        <div class="field">
+
+          <label data-i18n="waterLevel">
+            Water level
+          </label>
+
+          <select id="water">
+
+            <option data-i18n="unknown">
+              Unknown
+            </option>
+
+            <option data-i18n="belowAnkle">
+              Below ankle
+            </option>
+
+            <option data-i18n="ankleKnee">
+              Ankle–knee
+            </option>
+
+            <option data-i18n="kneeWaist">
+              Knee–waist
+            </option>
+
+            <option data-i18n="aboveWaist">
+              Above waist
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label data-i18n="status">
+            Status
+          </label>
+
+          <select id="status">
+
+            <option data-i18n="stillFlooding">
+              Still flooding
+            </option>
+
+            <option data-i18n="receding">
+              Receding
+            </option>
+
+            <option data-i18n="cleared">
+              Cleared
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field full">
+
+          <label data-i18n="description">
+            Description
+          </label>
+
+          <textarea
+            id="reportDesc"
+            rows="3"
+            placeholder="Example: water entering the storefront">
+          </textarea>
+
+        </div>
+
+        <div class="field full">
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="btn ghost"
+              onclick="cancelFloodReport()"
+              data-i18n="cancel">
+              Cancel
+            </button>
+
+            <button
+              class="btn primary"
+              id="confirmReportBtn"
+              data-i18n="confirmReport">
+              Confirm & place report
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     NEED MODAL
+========================= -->
+
+<div class="modal" id="needModal">
+
+  <div class="modalbox">
+
+    <div class="modalhead">
+
+      <h3 data-i18n="postCommunityNeed">
+        Post a community need
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('needModal')">
+        ✕
+      </button>
+
+    </div>
+
+    <form id="needForm">
+
+      <div class="formgrid">
+
+        <div class="field">
+
+          <label data-i18n="yourName">
+            Your name
+          </label>
+
+          <input id="needName" required>
+
+        </div>
+
+        <div class="field">
+
+          <label data-i18n="contactEmail">
+            Contact email
+          </label>
+
+          <input
+            id="needEmail"
+            type="email"
+            required>
+
+        </div>
+
+        <div class="field">
+
+          <label data-i18n="category">
+            Category
+          </label>
+
+          <select id="needCat">
+
+            <option>Water</option>
+            <option>Food</option>
+            <option>Medical supplies</option>
+            <option>Cleanup help</option>
+            <option>Business equipment</option>
+            <option>Temporary storage</option>
+            <option>Shelter</option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label data-i18n="urgency">
+            Urgency
+          </label>
+
+          <select id="needUrg">
+
+            <option>Urgent</option>
+            <option>High</option>
+            <option>Normal</option>
+
+          </select>
+
+        </div>
+
+        <div class="field full">
+
+          <label data-i18n="whatNeed">
+            What do you need?
+          </label>
+
+          <textarea
+            id="needText"
+            rows="4"
+            required></textarea>
+
+        </div>
+
+        <div class="field full">
+
+          <label data-i18n="areaBarangay">
+            Area / barangay
+          </label>
+
+          <input
+            id="needArea"
+            placeholder="e.g. Malanday"
+            required>
+
+        </div>
+
+        <div class="field full">
+
+          <button
+            class="btn primary"
+            data-i18n="postRequest">
+            Post request
+          </button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     LOGIN MODAL
+========================= -->
+
+<div class="modal" id="loginModal">
+
+  <div class="modalbox login-box">
+
+    <div class="login-logo">
+      ≋
+    </div>
+
+    <div class="modalhead">
+
+      <div>
+        <h3 data-i18n="loginTitle">
+          Log in to FloodLink
+        </h3>
+
+        <div
+          class="sub"
+          style="margin-top:5px"
+          data-i18n="loginSubtitle">
+          Access your saved business workspace.
+        </div>
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('loginModal')">
+        ✕
+      </button>
+
+    </div>
+
+    <form
+      id="loginForm"
+      style="margin-top:18px">
+
+      <div class="formgrid">
+
+        <div class="field full">
+
+          <label data-i18n="email">
+            Email
+          </label>
+
+          <input
+            id="loginEmail"
+            type="email"
+            autocomplete="email"
+            required>
+
+        </div>
+
+        <div class="field full">
+
+          <label data-i18n="password">
+            Password
+          </label>
+
+          <input
+            id="loginPassword"
+            type="password"
+            autocomplete="current-password"
+            minlength="4"
+            required>
+
+        </div>
+
+        <div class="field full">
+
+          <button
+            class="btn primary"
+            style="width:100%"
+            data-i18n="login">
+            Log in
+          </button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+    <div
+      class="login-note"
+      data-i18n="loginNote">
+      Demo login: your credentials are stored only in this
+      browser using localStorage. Do not use a real password
+      for this demo.
+    </div>
+
+  </div>
+
+</div>
+
+
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin="">
+</script>
+
+<script>
+/* =====================================================
+   FLOODLINK APPLICATION
+===================================================== */
+
+const MARIKINA = [14.6373, 121.0917];
+
+const hazardBarangays = [
+  "Barangka",
+  "Kalumpang",
+  "Concepcion Uno",
+  "Jesus Dela Peña",
+  "Malanday",
+  "Nangka",
+  "Fortune",
+  "San Roque",
+  "Sta. Elena",
+  "Sto. Niño",
+  "Tañong",
+  "Concepcion Dos",
+  "Marikina Heights",
+  "Industrial Valley"
+];
+
+/* =====================================================
+   TRANSLATIONS
+===================================================== */
+
+const translations = {
+
+  en: {
+
+    brandSubtitle:"Resilience • Recovery • Community",
+
+    navDashboard:"Dashboard",
+    navMap:"Live Map",
+    navNeeds:"Needs Board",
+    navMessages:"Messages",
+    navPreparedness:"Preparedness",
+    navBusiness:"Business",
+
+    emergencySidebar:
+      "For emergencies, contact Marikina Rescue 161. FloodLink is a community coordination tool, not a replacement for official emergency services.",
+
+    dashboardTitle:"Business Dashboard",
+    mapTitle:"Marikina Live Map",
+    needsPageTitle:"Community Needs",
+    messagesPageTitle:"Direct Messages",
+    preparednessPageTitle:"Preparedness",
+    profilePageTitle:"Business Profile",
+
+    marikinaFloodwatch:"MARIKINA FLOODWATCH",
+
+    heroTitle:
+      "Protect your business before the water rises.",
+
+    heroText:
+      "Track community flood reports, protect inventory, request help, and coordinate recovery from one calm workspace.",
+
+    openLiveMap:"Open live map",
+    postNeed:"Post a need",
+
+    currentReports:"Current reports",
+    communityFloodPins:"community flood pins",
+
+    openRequests:"Open requests",
+    needsWaiting:"needs waiting for help",
+
+    preparedness:"Preparedness",
+    checklistComplete:"checklist complete",
+
+    mapMode:"Map mode",
+
+    situationOverview:"Situation overview",
+
+    situationSub:
+      "Use the map for current community reports; official hazard areas are shown separately.",
+
+    twoLayers:"Flood information has two layers",
+
+    twoLayersText:
+      "Orange areas are documented hazard areas. Red pins are user-submitted observations and include a timestamp. Treat user reports as unverified until confirmed.",
+
+    rescueNotice:
+      "Marikina's official emergency service is Rescue 161. Save the number before an emergency.",
+
+    businessRecovery:"Business recovery",
+    overallProgress:"Overall progress",
+
+    inventory:"Inventory",
+    documents:"Documents",
+    staff:"Staff",
+    suppliers:"Suppliers",
+
+    marikinaLiveMap:"Marikina Live Map",
+
+    mapInstructions:
+      "Start a flood report, then drag the red pin or click the map to position it before confirming. Your business marker can also be moved.",
+
+    moveFloodPin:
+      "Move the red flood pin to the exact location.",
+
+    myBusiness:"My business",
+    marikina:"Marikina",
+    clearReports:"Clear my demo reports",
+
+    communityReport:"Community flood report",
+    hazardArea:"Documented hazard area",
+    shelter:"Verified/open shelter",
+    business:"Business",
+    resources:"Resources",
+
+    mapNotice:
+      "Map tiles are live from OpenStreetMap. Flood reports created in this demo are saved on this device. For true cross-device live sharing, connect a shared database such as Supabase or Firebase.",
+
+    needsTitle:"Community Needs Board",
+
+    needsSub:
+      "Requests are visible locally in this prototype. A shared backend is required for other users to see them across devices.",
+
+    messagesTitle:"Direct Messages",
+
+    messagesSub:
+      "Coordinate privately about specific requests or offers.",
+
+    conversations:"Conversations",
+    sendMessage:"Send a message",
+
+    yourName:"Your name",
+    yourEmail:"Your email",
+    recipient:"Who are you contacting?",
+    message:"Message",
+    sendByEmail:"Send securely by email",
+
+    preparednessTitle:"Preparedness Checklist",
+
+    preparednessSub:
+      "Saved locally so the checklist remains available offline.",
+
+    profileTitle:"Business Profile",
+
+    profileSub:
+      "Your business marker is placed from these coordinates.",
+
+    businessName:"Business name",
+    ownerName:"Owner/contact name",
+    businessAddress:"Business address",
+    latitude:"Latitude",
+    longitude:"Longitude",
+    saveLocation:"Save business location",
+
+    emergencyCard:"Emergency card",
+
+    emergencyInstructions:
+      "Always follow official instructions during an active emergency.",
+
+    shelterNotice:
+      "FloodLink does not label a shelter as “open” unless it has been verified. Shelter status can change quickly.",
+
+    reportFlooding:"Report flooding",
+
+    reportModalText:
+      "The red marker has been placed on the map. Drag it or click another location on the map to move it before confirming the report.",
+
+    waterLevel:"Water level",
+    status:"Status",
+    description:"Description",
+
+    unknown:"Unknown",
+    belowAnkle:"Below ankle",
+    ankleKnee:"Ankle–knee",
+    kneeWaist:"Knee–waist",
+    aboveWaist:"Above waist",
+
+    stillFlooding:"Still flooding",
+    receding:"Receding",
+    cleared:"Cleared",
+
+    cancel:"Cancel",
+    confirmReport:"Confirm & place report",
+
+    postCommunityNeed:"Post a community need",
+    contactEmail:"Contact email",
+    category:"Category",
+    urgency:"Urgency",
+    whatNeed:"What do you need?",
+    areaBarangay:"Area / barangay",
+    postRequest:"Post request",
+
+    loginTitle:"Log in to FloodLink",
+    loginSubtitle:"Access your saved business workspace.",
+    email:"Email",
+    password:"Password",
+    login:"Log in",
+    logout:"Log out",
+
+    loginNote:
+      "Demo login: your credentials are stored only in this browser using localStorage. Do not use a real password for this demo.",
+
+    guest:"Guest",
+    notLoggedIn:"Not logged in",
+
+    accountLoggedIn:"Logged in",
+
+    noRequests:
+      "No requests yet. Post the first community need.",
+
+    messagePrompt:
+      "No saved conversations yet. Use the message form to contact someone about a request.",
+
+    complete:"Complete",
+    notCompleted:"Not completed",
+
+    locationNotSelected:"Location not selected yet.",
+
+    locationSelected:"Selected location",
+
+    reportCommunity:
+      "Community flood report",
+
+    businessLocation:
+      "Business location",
+
+    areaReference:
+      "Area-level reference. This is not a real-time water-depth reading.",
+
+    noDescription:"No description",
+
+    help:"Offer help",
+    helped:"Helped",
+    emailLabel:"Email",
+
+    loginRequired:
+      "Please log in first to submit a community flood report.",
+
+    invalidLogin:
+      "Please enter a valid email and a password with at least 4 characters.",
+
+    loggedOut:
+      "You have been logged out.",
+
+    loggedIn:
+      "You are now logged in.",
+
+    reportStarted:
+      "Move the red marker to the flood location, then confirm the report.",
+
+    reportCancelled:
+      "Flood report placement cancelled.",
+
+    reportSaved:
+      "Flood report saved.",
+
+    profileSaved:
+      "Business profile saved.",
+
+    needSaved:
+      "Community need posted.",
+
+    reportsCleared:
+      "Demo flood reports cleared.",
+
+    mapHazard:
+      "Documented flood-hazard area"
+
+  },
+
+  fil: {
+
+    brandSubtitle:"Katatagan • Pagbangon • Komunidad",
+
+    navDashboard:"Dashboard",
+    navMap:"Live na Mapa",
+    navNeeds:"Mga Pangangailangan",
+    navMessages:"Mga Mensahe",
+    navPreparedness:"Paghahanda",
+    navBusiness:"Negosyo",
+
+    emergencySidebar:
+      "Para sa emergency, makipag-ugnayan sa Marikina Rescue 161. Ang FloodLink ay para sa koordinasyon ng komunidad at hindi kapalit ng opisyal na serbisyong pang-emergency.",
+
+    dashboardTitle:"Dashboard ng Negosyo",
+    mapTitle:"Live na Mapa ng Marikina",
+    needsPageTitle:"Mga Pangangailangan",
+    messagesPageTitle:"Mga Mensahe",
+    preparednessPageTitle:"Paghahanda",
+    profilePageTitle:"Profile ng Negosyo",
+
+    marikinaFloodwatch:"MARIKINA FLOODWATCH",
+
+    heroTitle:
+      "Protektahan ang iyong negosyo bago tumaas ang tubig.",
+
+    heroText:
+      "Subaybayan ang mga ulat ng baha, protektahan ang imbentaryo, humingi ng tulong, at makipag-ugnayan para sa pagbangon sa iisang workspace.",
+
+    openLiveMap:"Buksan ang live na mapa",
+    postNeed:"Mag-post ng pangangailangan",
+
+    currentReports:"Kasalukuyang ulat",
+    communityFloodPins:"mga flood pin ng komunidad",
+
+    openRequests:"Mga bukas na request",
+    needsWaiting:"naghihintay ng tulong",
+
+    preparedness:"Paghahanda",
+    checklistComplete:"kumpletong checklist",
+
+    mapMode:"Mode ng mapa",
+
+    situationOverview:"Kalagayan",
+
+    situationSub:
+      "Gamitin ang mapa para sa kasalukuyang ulat ng komunidad; hiwalay na ipinapakita ang mga hazard area.",
+
+    twoLayers:"Dalawang layer ang impormasyon tungkol sa baha",
+
+    twoLayersText:
+      "Ang orange ay mga dokumentadong hazard area. Ang pulang pin ay mga obserbasyon ng user na may oras. Ituring na hindi beripikado ang mga ulat ng user hangga't hindi nakukumpirma.",
+
+    rescueNotice:
+      "Ang opisyal na emergency service ng Marikina ay Rescue 161. I-save ang numero bago magkaroon ng emergency.",
+
+    businessRecovery:"Pagbangon ng negosyo",
+    overallProgress:"Kabuuang progreso",
+
+    inventory:"Imbentaryo",
+    documents:"Mga dokumento",
+    staff:"Staff",
+    suppliers:"Mga supplier",
+
+    marikinaLiveMap:"Live na Mapa ng Marikina",
+
+    mapInstructions:
+      "Magsimula ng flood report, pagkatapos ay i-drag ang pulang pin o i-click ang mapa para ilagay ito bago kumpirmahin. Maaari ring ilipat ang business marker.",
+
+    moveFloodPin:
+      "Ilipat ang pulang flood pin sa eksaktong lokasyon.",
+
+    myBusiness:"Aking negosyo",
+    marikina:"Marikina",
+    clearReports:"Burahin ang demo reports",
+
+    communityReport:"Ulat ng baha ng komunidad",
+    hazardArea:"Dokumentadong hazard area",
+    shelter:"Beripikado/bukas na shelter",
+    business:"Negosyo",
+    resources:"Resources",
+
+    mapNotice:
+      "Live ang map tiles mula sa OpenStreetMap. Ang mga flood report sa demo ay naka-save sa device na ito. Para sa totoong cross-device sharing, gumamit ng shared database gaya ng Supabase o Firebase.",
+
+    needsTitle:"Community Needs Board",
+
+    needsSub:
+      "Makikita lamang locally ang mga request sa prototype na ito. Kailangan ng shared backend para makita ito ng ibang users sa ibang device.",
+
+    messagesTitle:"Direktang Mensahe",
+
+    messagesSub:
+      "Makipag-ugnayan nang pribado tungkol sa mga request o alok ng tulong.",
+
+    conversations:"Mga pag-uusap",
+    sendMessage:"Magpadala ng mensahe",
+
+    yourName:"Iyong pangalan",
+    yourEmail:"Iyong email",
+    recipient:"Sino ang kokontakin?",
+    message:"Mensahe",
+    sendByEmail:"Ipadala sa email",
+
+    preparednessTitle:"Checklist sa Paghahanda",
+
+    preparednessSub:
+      "Naka-save locally upang manatiling available offline.",
+
+    profileTitle:"Profile ng Negosyo",
+
+    profileSub:
+      "Ang business marker ay inilalagay gamit ang mga coordinate na ito.",
+
+    businessName:"Pangalan ng negosyo",
+    ownerName:"Pangalan ng may-ari/contact",
+    businessAddress:"Address ng negosyo",
+    latitude:"Latitude",
+    longitude:"Longitude",
+    saveLocation:"I-save ang lokasyon",
+
+    emergencyCard:"Emergency card",
+
+    emergencyInstructions:
+      "Palaging sundin ang opisyal na instructions habang may aktibong emergency.",
+
+    shelterNotice:
+      "Hindi minamarkahan ng FloodLink ang shelter bilang “bukas” hangga't hindi ito beripikado. Maaaring mabilis magbago ang status ng shelter.",
+
+    reportFlooding:"Mag-report ng baha",
+
+    reportModalText:
+      "Nailagay na ang pulang marker sa mapa. I-drag ito o mag-click ng ibang lokasyon sa mapa para ilipat ito bago kumpirmahin.",
+
+    waterLevel:"Lalim ng tubig",
+    status:"Status",
+    description:"Deskripsyon",
+
+    unknown:"Hindi alam",
+    belowAnkle:"Mas mababa sa bukung-bukong",
+    ankleKnee:"Bukung-bukong hanggang tuhod",
+    kneeWaist:"Tuhod hanggang baywang",
+    aboveWaist:"Lampas baywang",
+
+    stillFlooding:"Bumabaha pa",
+    receding:"Humuhupa",
+    cleared:"Wala na ang baha",
+
+    cancel:"Kanselahin",
+    confirmReport:"Kumpirmahin at ilagay",
+
+    postCommunityNeed:"Mag-post ng community need",
+    contactEmail:"Contact email",
+    category:"Kategorya",
+    urgency:"Urgency",
+    whatNeed:"Ano ang kailangan?",
+    areaBarangay:"Lugar / barangay",
+    postRequest:"I-post ang request",
+
+    loginTitle:"Mag-log in sa FloodLink",
+    loginSubtitle:"I-access ang iyong naka-save na business workspace.",
+    email:"Email",
+    password:"Password",
+    login:"Mag-log in",
+    logout:"Mag-log out",
+
+    loginNote:
+      "Demo login: ang credentials ay naka-save lamang sa browser na ito gamit ang localStorage. Huwag gumamit ng totoong password para sa demo.",
+
+    guest:"Guest",
+    notLoggedIn:"Hindi naka-log in",
+
+    accountLoggedIn:"Naka-log in",
+
+    noRequests:
+      "Wala pang request. Mag-post ng unang community need.",
+
+    messagePrompt:
+      "Wala pang naka-save na conversation. Gamitin ang message form para makipag-ugnayan tungkol sa isang request.",
+
+    complete:"Kumpleto",
+    notCompleted:"Hindi kumpleto",
+
+    locationNotSelected:"Wala pang napipiling lokasyon.",
+
+    locationSelected:"Napiling lokasyon",
+
+    reportCommunity:
+      "Ulat ng baha ng komunidad",
+
+    businessLocation:
+      "Lokasyon ng negosyo",
+
+    areaReference:
+      "Area-level reference. Hindi ito real-time na reading ng lalim ng tubig.",
+
+    noDescription:"Walang deskripsyon",
+
+    help:"Mag-alok ng tulong",
+    helped:"Nakatulong na",
+    emailLabel:"Email",
+
+    loginRequired:
+      "Mag-log in muna bago magsumite ng community flood report.",
+
+    invalidLogin:
+      "Maglagay ng valid na email at password na may hindi bababa sa 4 na character.",
+
+    loggedOut:
+      "Na-log out ka na.",
+
+    loggedIn:
+      "Naka-log in ka na.",
+
+    reportStarted:
+      "Ilipat ang pulang marker sa lokasyon ng baha, pagkatapos ay kumpirmahin ang report.",
+
+    reportCancelled:
+      "Kinansela ang flood report placement.",
+
+    reportSaved:
+      "Na-save ang flood report.",
+
+    profileSaved:
+      "Na-save ang business profile.",
+
+    needSaved:
+      "Na-post ang community need.",
+
+    reportsCleared:
+      "Nabura ang demo flood reports.",
+
+    mapHazard:
+      "Dokumentadong flood-hazard area"
+
+  }
+
+};
+
+/* =====================================================
+   STATE
+===================================================== */
+
+const defaultProfile = {
+  name:"My Business",
+  owner:"",
+  address:"Marikina City",
+  lat:14.6373,
+  lng:121.0917
+};
+
+function readJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+const state = {
+
+  profile: {
+    ...defaultProfile,
+    ...readJSON("fl_profile", {})
+  },
+
+  reports:readJSON("fl_reports", []),
+
+  needs:readJSON("fl_needs", []),
+
+  messages:readJSON("fl_messages", []),
+
+  checks:readJSON("fl_checks", {}),
+
+  lang:localStorage.getItem("fl_lang") || "en",
+
+  user:readJSON("fl_user", null)
+
+};
+
+let map = null;
+let businessMarker = null;
+let reportLayer = null;
+
+let reportPlacementMarker = null;
+let reportPlacementActive = false;
+let selectedPoint = null;
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function t(key) {
+  return translations[state.lang]?.[key]
+    || translations.en[key]
+    || key;
+}
+
+function showToast(message) {
+  let toast = document.getElementById("toast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+
+    toast.style.position = "fixed";
+    toast.style.left = "50%";
+    toast.style.bottom = "25px";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.zIndex = "5000";
+    toast.style.maxWidth = "calc(100% - 30px)";
+    toast.style.padding = "12px 17px";
+    toast.style.borderRadius = "14px";
+    toast.style.background = "#082f52";
+    toast.style.color = "#fff";
+    toast.style.fontWeight = "700";
+    toast.style.fontSize = "13px";
+    toast.style.boxShadow = "0 15px 40px rgba(0,0,0,.25)";
+
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+
+  clearTimeout(window.__toastTimer);
+
+  window.__toastTimer = setTimeout(() => {
+    toast.remove();
+  }, 2800);
+}
+
+/* =====================================================
+   STORAGE
+===================================================== */
+
+function save() {
+
+  localStorage.setItem(
+    "fl_profile",
+    JSON.stringify(state.profile)
+  );
+
+  localStorage.setItem(
+    "fl_reports",
+    JSON.stringify(state.reports)
+  );
+
+  localStorage.setItem(
+    "fl_needs",
+    JSON.stringify(state.needs)
+  );
+
+  localStorage.setItem(
+    "fl_messages",
+    JSON.stringify(state.messages)
+  );
+
+  localStorage.setItem(
+    "fl_checks",
+    JSON.stringify(state.checks)
+  );
+
+}
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+const pageTitles = {
+  dashboard:"dashboardTitle",
+  map:"mapTitle",
+  needs:"needsPageTitle",
+  messages:"messagesPageTitle",
+  preparedness:"preparednessPageTitle",
+  profile:"profilePageTitle"
+};
+
+function showView(id) {
+
+  document
+    .querySelectorAll(".view")
+    .forEach(view => {
+      view.classList.remove("active");
+    });
+
+  const target = document.getElementById(id);
+
+  if (!target) return;
+
+  target.classList.add("active");
+
+  document
+    .querySelectorAll(".nav button")
+    .forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.view === id
+      );
+    });
+
+  document.getElementById("pageTitle").textContent =
+    t(pageTitles[id] || "dashboardTitle");
+
+  if (id === "map") {
+
+    setTimeout(() => {
+
+      initMap();
+
+      if (map) {
+        map.invalidateSize();
+      }
+
+    },50);
+
+  }
+
+}
+
+document
+  .querySelectorAll(".nav button")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+      showView(button.dataset.view);
+    });
+
+  });
+
+/* =====================================================
+   MODALS
+===================================================== */
+
+function openModal(id) {
+
+  const modal = document.getElementById(id);
+
+  if (modal) {
+    modal.classList.add("open");
+  }
+
+}
+
+function closeModal(id) {
+
+  const modal = document.getElementById(id);
+
+  if (modal) {
+    modal.classList.remove("open");
+  }
+
+}
+
+document
+  .querySelectorAll(".modal")
+  .forEach(modal => {
+
+    modal.addEventListener("click", event => {
+
+      if (event.target === modal) {
+        modal.classList.remove("open");
+      }
+
+    });
+
+  });
+
+document.addEventListener("keydown", event => {
+
+  if (event.key === "Escape") {
+
+    document
+      .querySelectorAll(".modal.open")
+      .forEach(modal => {
+        modal.classList.remove("open");
+      });
+
+  }
+
+});
+
+/* =====================================================
+   MAP INITIALIZATION
+===================================================== */
+
+function initMap() {
+
+  if (map) return;
+
+  map = L.map("mapCanvas", {
+    zoomControl:true
+  }).setView(MARIKINA,13.7);
+
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom:19,
+      attribution:"© OpenStreetMap contributors"
+    }
+  ).addTo(map);
+
+  reportLayer = L.layerGroup().addTo(map);
+
+  const offsets = [
+    [.010,-.018],
+    [-.003,-.012],
+    [.006,.006],
+    [.004,.018],
+    [-.005,.026],
+    [-.015,.010],
+    [-.022,-.006],
+    [-.012,-.020],
+    [.002,-.025],
+    [.018,-.006],
+    [.012,.024],
+    [.024,.008],
+    [-.027,.020],
+    [-.020,-.022]
+  ];
+
+  hazardBarangays.forEach((name,index) => {
+
+    const offset = offsets[index];
+
+    L.circle(
+      [
+        MARIKINA[0] + offset[0],
+        MARIKINA[1] + offset[1]
+      ],
+      {
+        radius:850,
+        color:"#f59e0b",
+        weight:2,
+        fillOpacity:.12
+      }
+    )
+    .addTo(map)
+    .bindPopup(`
+      <b>${escapeHtml(t("mapHazard"))}</b>
+      <br>
+      ${escapeHtml(name)}
+      <br><br>
+      <small>
+        ${escapeHtml(t("areaReference"))}
+      </small>
+    `);
+
+  });
+
+  businessMarker =
+    L.marker(
+      [
+        state.profile.lat,
+        state.profile.lng
+      ],
+      {
+        draggable:true
+      }
+    )
+    .addTo(map)
+    .bindPopup(`
+      <b>${escapeHtml(state.profile.name)}</b>
+      <br>
+      ${escapeHtml(t("businessLocation"))}
+    `);
+
+  businessMarker.on("dragend", () => {
+
+    const position =
+      businessMarker.getLatLng();
+
+    state.profile.lat =
+      Number(position.lat.toFixed(6));
+
+    state.profile.lng =
+      Number(position.lng.toFixed(6));
+
+    save();
+    renderProfile();
+
+  });
+
+  /*
+    IMPORTANT:
+    Map clicks do NOT automatically open the
+    report modal anymore.
+
+    While report placement is active, clicking
+    the map simply moves the draggable report pin.
+  */
+
+  map.on("click", event => {
+
+    if (!reportPlacementActive) {
+      return;
+    }
+
+    moveReportPlacementMarker(
+      event.latlng.lat,
+      event.latlng.lng
+    );
+
+  });
+
+  renderReports();
+
+}
+
+/* =====================================================
+   CUSTOM MARKERS
+===================================================== */
+
+function markerIcon(color) {
+
+  return L.divIcon({
+
+    className:"",
+
+    html:`
+      <div style="
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        background:${color};
+        border:3px solid white;
+        box-shadow:0 2px 10px #3338;
+      "></div>
+    `,
+
+    iconSize:[18,18],
+    iconAnchor:[9,9]
+
+  });
+
+}
+
+function reportPlacementIcon() {
+
+  return L.divIcon({
+
+    className:"report-pin-wrapper",
+
+    html:`
+      <div class="report-pin"></div>
+      <div class="report-pin-label">
+        ${escapeHtml(
+          state.lang === "fil"
+            ? "Ilipat ako"
+            : "Drag me"
+        )}
+      </div>
+    `,
+
+    iconSize:[30,30],
+    iconAnchor:[15,30]
+
+  });
+
+}
+
+/* =====================================================
+   FLOOD REPORT PLACEMENT
+===================================================== */
+
+function startFloodReport() {
+
+  if (!state.user) {
+
+    openModal("loginModal");
+
+    showToast(t("loginRequired"));
+
+    return;
+
+  }
+
+  showView("map");
+
+  initMap();
+
+  reportPlacementActive = true;
+
+  const center = map.getCenter();
+
+  selectedPoint = [
+    center.lat,
+    center.lng
+  ];
+
+  if (reportPlacementMarker) {
+    reportPlacementMarker.remove();
+  }
+
+  reportPlacementMarker =
+    L.marker(
+      selectedPoint,
+      {
+        draggable:true,
+        icon:reportPlacementIcon(),
+        zIndexOffset:1000
+      }
+    )
+    .addTo(map);
+
+  reportPlacementMarker.on("dragend", () => {
+
+    const position =
+      reportPlacementMarker.getLatLng();
+
+    selectedPoint = [
+      position.lat,
+      position.lng
+    ];
+
+    updateSelectedLocationText();
+
+  });
+
+  document
+    .getElementById("reportPlacementBanner")
+    .classList.add("active");
+
+  updateSelectedLocationText();
+
+  openModal("reportModal");
+
+  showToast(t("reportStarted"));
+
+}
+
+function moveReportPlacementMarker(lat,lng) {
+
+  if (!reportPlacementActive) {
+    return;
+  }
+
+  selectedPoint = [
+    lat,
+    lng
+  ];
+
+  if (!reportPlacementMarker) {
+
+    reportPlacementMarker =
+      L.marker(
+        selectedPoint,
+        {
+          draggable:true,
+          icon:reportPlacementIcon(),
+          zIndexOffset:1000
+        }
+      )
+      .addTo(map);
+
+    reportPlacementMarker.on("dragend", () => {
+
+      const position =
+        reportPlacementMarker.getLatLng();
+
+      selectedPoint = [
+        position.lat,
+        position.lng
+      ];
+
+      updateSelectedLocationText();
+
+    });
+
+  } else {
+
+    reportPlacementMarker.setLatLng(
+      selectedPoint
+    );
+
+  }
+
+  updateSelectedLocationText();
+
+}
+
+function updateSelectedLocationText() {
+
+  const element =
+    document.getElementById(
+      "selectedLocationText"
+    );
+
+  if (!element) return;
+
+  if (!selectedPoint) {
+
+    element.textContent =
+      t("locationNotSelected");
+
+    return;
+
+  }
+
+  element.textContent =
+    `${t("locationSelected")}: ` +
+    `${selectedPoint[0].toFixed(6)}, ` +
+    `${selectedPoint[1].toFixed(6)}`;
+
+}
+
+function finishFloodReportPlacement() {
+
+  reportPlacementActive = false;
+
+  if (reportPlacementMarker) {
+
+    reportPlacementMarker.remove();
+
+    reportPlacementMarker = null;
+
+  }
+
+  document
+    .getElementById("reportPlacementBanner")
+    .classList.remove("active");
+
+}
+
+/* =====================================================
+   REPORT FORM
+===================================================== */
+
+document
+  .getElementById("startReportBtn")
+  .addEventListener(
+    "click",
+    startFloodReport
+  );
+
+document
+  .getElementById("cancelReportPlacement")
+  .addEventListener(
+    "click",
+    cancelFloodReport
+  );
+
+function cancelFloodReport() {
+
+  finishFloodReportPlacement();
+
+  selectedPoint = null;
+
+  closeModal("reportModal");
+
+  document
+    .getElementById("reportForm")
+    .reset();
+
+  updateSelectedLocationText();
+
+  showToast(t("reportCancelled"));
+
+}
+
+document
+  .getElementById("reportForm")
+  .addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+      if (!state.user) {
+
+        openModal("loginModal");
+
+        showToast(t("loginRequired"));
+
+        return;
+
+      }
+
+      if (!selectedPoint) {
+
+        const center = map.getCenter();
+
+        selectedPoint = [
+          center.lat,
+          center.lng
+        ];
+
+      }
+
+      state.reports.unshift({
+
+        id:Date.now(),
+
+        lat:selectedPoint[0],
+
+        lng:selectedPoint[1],
+
+        water:
+          document.getElementById(
+            "water"
+          ).value,
+
+        status:
+          document.getElementById(
+            "status"
+          ).value,
+
+        desc:
+          document.getElementById(
+            "reportDesc"
+          ).value.trim(),
+
+        time:
+          new Date().toISOString(),
+
+        reportedBy:
+          state.user.email
+
+      });
+
+      save();
+
+      finishFloodReportPlacement();
+
+      selectedPoint = null;
+
+      event.target.reset();
+
+      closeModal("reportModal");
+
+      renderReports();
+
+      updateStats();
+
+      showToast(t("reportSaved"));
+
+    }
+  );
+
+/* =====================================================
+   RENDER FLOOD REPORTS
+===================================================== */
+
+function renderReports() {
+
+  if (!map || !reportLayer) {
+    return;
+  }
+
+  reportLayer.clearLayers();
+
+  state.reports.forEach(report => {
+
+    L.marker(
+      [
+        report.lat,
+        report.lng
+      ],
+      {
+        icon:markerIcon("#e5484d")
+      }
+    )
+    .addTo(reportLayer)
+    .bindPopup(`
+      <b>${escapeHtml(t("reportCommunity"))}</b>
+      <br>
+      ${escapeHtml(report.water)}
+      ·
+      ${escapeHtml(report.status)}
+      <br>
+      ${escapeHtml(
+        report.desc || t("noDescription")
+      )}
+      <br><br>
+      <small>
+        ${escapeHtml(
+          new Date(report.time).toLocaleString()
+        )}
+      </small>
+    `);
+
+  });
+
+  updateStats();
+
+}
+
+/* =====================================================
+   MAP CONTROLS
+===================================================== */
+
+function locateBusiness() {
+
+  initMap();
+
+  map.setView(
+    [
+      state.profile.lat,
+      state.profile.lng
+    ],
+    16
+  );
+
+  if (businessMarker) {
+    businessMarker.openPopup();
+  }
+
+}
+
+function fitMarikina() {
+
+  initMap();
+
+  map.setView(
+    MARIKINA,
+    13.7
+  );
+
+}
+
+function clearMyReports() {
+
+  if (!state.reports.length) {
+    return;
+  }
+
+  const confirmed =
+    confirm(
+      state.lang === "fil"
+        ? "Burahin ang lahat ng demo flood reports?"
+        : "Clear all demo flood reports?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  state.reports = [];
+
+  save();
+
+  renderReports();
+
+  updateStats();
+
+  showToast(t("reportsCleared"));
+
+}
+
+/* =====================================================
+   NEEDS BOARD
+===================================================== */
+
+document
+  .getElementById("needForm")
+  .addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+      state.needs.unshift({
+
+        id:Date.now(),
+
+        name:
+          document.getElementById(
+            "needName"
+          ).value.trim(),
+
+        email:
+          document.getElementById(
+            "needEmail"
+          ).value.trim(),
+
+        cat:
+          document.getElementById(
+            "needCat"
+          ).value,
+
+        urg:
+          document.getElementById(
+            "needUrg"
+          ).value,
+
+        text:
+          document.getElementById(
+            "needText"
+          ).value.trim(),
+
+        area:
+          document.getElementById(
+            "needArea"
+          ).value.trim(),
+
+        time:
+          new Date().toISOString(),
+
+        helped:false
+
+      });
+
+      save();
+
+      closeModal("needModal");
+
+      event.target.reset();
+
+      renderNeeds();
+
+      updateStats();
+
+      showView("needs");
+
+      showToast(t("needSaved"));
+
+    }
+  );
+
+function renderNeeds() {
+
+  const element =
+    document.getElementById("needsList");
+
+  if (!state.needs.length) {
+
+    element.innerHTML = `
+      <div class="empty">
+        ${escapeHtml(t("noRequests"))}
+      </div>
+    `;
+
+    return;
+
+  }
+
+  element.innerHTML =
+    state.needs
+      .map(need => `
+
+        <div class="need">
+
+          <div>
+
+            <h4>
+              ${escapeHtml(need.text)}
+            </h4>
+
+            <p>
+              ${escapeHtml(need.name)}
+              ·
+              ${escapeHtml(need.area)}
+              ·
+              ${escapeHtml(
+                new Date(
+                  need.time
+                ).toLocaleString()
+              )}
+            </p>
+
+            <div class="tags">
+
+              <span class="tag">
+                ${escapeHtml(need.cat)}
+              </span>
+
+              <span class="tag">
+                ${escapeHtml(need.urg)}
+              </span>
+
+            </div>
+
+          </div>
+
+          <div style="
+            display:flex;
+            gap:7px;
+            align-items:center;
+            flex-wrap:wrap;
+          ">
+
+            <button
+              class="btn secondary small"
+              onclick="messageNeed(${Number(need.id)})">
+              Message
+            </button>
+
+            <button
+              class="btn primary small"
+              onclick="markHelped(${Number(need.id)})">
+              ${need.helped
+                ? escapeHtml(t("helped"))
+                : escapeHtml(t("help"))
+              }
+            </button>
+
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+function messageNeed(id) {
+
+  const need =
+    state.needs.find(
+      item =>
+        String(item.id) === String(id)
+    );
+
+  if (!need) return;
+
+  showView("messages");
+
+  const recipient =
+    document.querySelector(
+      'input[name="recipient"]'
+    );
+
+  if (recipient) {
+
+    recipient.value =
+      need.name +
+      " — request #" +
+      need.id;
+
+  }
+
+}
+
+function markHelped(id) {
+
+  const need =
+    state.needs.find(
+      item =>
+        String(item.id) === String(id)
+    );
+
+  if (!need) return;
+
+  need.helped = true;
+
+  save();
+
+  renderNeeds();
+
+  updateStats();
+
+}
+
+/* =====================================================
+   MESSAGES
+===================================================== */
+
+function renderMessages() {
+
+  const element =
+    document.getElementById(
+      "messageList"
+    );
+
+  if (!state.messages.length) {
+
+    element.innerHTML = `
+      <div class="empty">
+        ${escapeHtml(t("messagePrompt"))}
+      </div>
+    `;
+
+    return;
+
+  }
+
+  element.innerHTML =
+    state.messages
+      .map(message => `
+
+        <div class="person">
+
+          <div>
+
+            <h4>
+              ${escapeHtml(message.to)}
+            </h4>
+
+            <p>
+              ${escapeHtml(message.preview)}
+            </p>
+
+          </div>
+
+          <span class="tag">
+            ${escapeHtml(t("emailLabel"))}
+          </span>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+/* =====================================================
+   BUSINESS PROFILE
+===================================================== */
+
+function renderProfile() {
+
+  document.getElementById("bizName").value =
+    state.profile.name || "";
+
+  document.getElementById("ownerName").value =
+    state.profile.owner || "";
+
+  document.getElementById("bizAddress").value =
+    state.profile.address || "";
+
+  document.getElementById("bizLat").value =
+    state.profile.lat;
+
+  document.getElementById("bizLng").value =
+    state.profile.lng;
+
+  updateAccountUI();
+
+}
+
+document
+  .getElementById("profileForm")
+  .addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+      state.profile = {
+
+        name:
+          document.getElementById(
+            "bizName"
+          ).value.trim(),
+
+        owner:
+          document.getElementById(
+            "ownerName"
+          ).value.trim(),
+
+        address:
+          document.getElementById(
+            "bizAddress"
+          ).value.trim(),
+
+        lat:
+          Number(
+            document.getElementById(
+              "bizLat"
+            ).value
+          ) || MARIKINA[0],
+
+        lng:
+          Number(
+            document.getElementById(
+              "bizLng"
+            ).value
+          ) || MARIKINA[1]
+
+      };
+
+      save();
+
+      renderProfile();
+
+      if (businessMarker) {
+
+        businessMarker
+          .setLatLng([
+            state.profile.lat,
+            state.profile.lng
+          ])
+          .bindPopup(`
+            <b>
+              ${escapeHtml(
+                state.profile.name
+              )}
+            </b>
+            <br>
+            ${escapeHtml(
+              t("businessLocation")
+            )}
+          `);
+
+        map.setView(
+          [
+            state.profile.lat,
+            state.profile.lng
+          ],
+          16
+        );
+
+      }
+
+      showToast(t("profileSaved"));
+
+    }
+  );
+
+/* =====================================================
+   PREPAREDNESS
+===================================================== */
+
+const checklistItems = [
+
+  "Emergency contacts saved",
+  "Inventory elevated/protected",
+  "Important documents backed up",
+  "Generator/power plan ready",
+  "Insurance details accessible",
+  "Employee communication plan",
+  "Supplier recovery contacts",
+  "Emergency kit checked",
+  "Evacuation route reviewed"
+
+];
+
+function renderChecklist() {
+
+  const element =
+    document.getElementById(
+      "checklist"
+    );
+
+  element.innerHTML =
+    checklistItems
+      .map(
+        (item,index) => `
+
+          <label
+            class="card"
+            style="
+              display:flex;
+              gap:12px;
+              align-items:flex-start;
+              cursor:pointer;
+            ">
+
+            <input
+              type="checkbox"
+              ${state.checks[index] ? "checked" : ""}
+              onchange="
+                toggleCheck(
+                  ${index},
+                  this.checked
+                )
+              "
+              style="
+                margin-top:4px;
+                width:18px;
+                height:18px;
+              ">
+
+            <div>
+
+              <b>
+                ${escapeHtml(item)}
+              </b>
+
+              <div
+                class="sub"
+                style="margin-top:5px">
+
+                ${
+                  state.checks[index]
+                    ? escapeHtml(t("complete"))
+                    : escapeHtml(t("notCompleted"))
+                }
+
+              </div>
+
+            </div>
+
+          </label>
+
+        `
+      )
+      .join("");
+
+}
+
+function toggleCheck(index,value) {
+
+  state.checks[index] = value;
+
+  save();
+
+  updateStats();
+
+  renderChecklist();
+
+}
+
+/* =====================================================
+   STATISTICS
+===================================================== */
+
+function updateStats() {
+
+  document.getElementById(
+    "reportCount"
+  ).textContent =
+    state.reports.length;
+
+  document.getElementById(
+    "needCount"
+  ).textContent =
+    state.needs.filter(
+      need => !need.helped
+    ).length;
+
+  const completed =
+    Object.values(state.checks)
+      .filter(Boolean)
+      .length;
+
+  const percentage =
+    Math.round(
+      completed /
+      checklistItems.length *
+      100
+    );
+
+  document.getElementById(
+    "prepPct"
+  ).textContent =
+    percentage + "%";
+
+  document.getElementById(
+    "recoveryText"
+  ).textContent =
+    percentage + "%";
+
+  document.getElementById(
+    "recoveryBar"
+  ).style.width =
+    percentage + "%";
+
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+const darkBtn =
+  document.getElementById("darkBtn");
+
+function updateDarkButton() {
+
+  darkBtn.textContent =
+    document.body.classList.contains("dark")
+      ? "☀"
+      : "☾";
+
+  darkBtn.title =
+    document.body.classList.contains("dark")
+      ? "Switch to light mode"
+      : "Switch to dark mode";
+
+}
+
+darkBtn.addEventListener(
+  "click",
+  () => {
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+      "fl_dark",
+      document.body.classList.contains("dark")
+    );
+
+    updateDarkButton();
+
+  }
+);
+
+if (
+  localStorage.getItem("fl_dark") === "true"
+) {
+
+  document.body.classList.add("dark");
+
+}
+
+updateDarkButton();
+
+/* =====================================================
+   LANGUAGE / TRANSLATOR
+===================================================== */
+
+function translatePage() {
+
+  document.documentElement.lang =
+    state.lang === "fil"
+      ? "fil"
+      : "en";
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(element => {
+
+      const key =
+        element.dataset.i18n;
+
+      if (
+        translations[state.lang] &&
+        translations[state.lang][key]
+      ) {
+
+        element.textContent =
+          translations[state.lang][key];
+
+      }
+
+    });
+
+  document.getElementById(
+    "langBtn"
+  ).textContent =
+    state.lang === "en"
+      ? "FIL"
+      : "EN";
+
+  document.getElementById(
+    "pageTitle"
+  ).textContent =
+    t(
+      pageTitles[
+        document
+          .querySelector(".view.active")
+          ?.id || "dashboard"
+      ] || "dashboardTitle"
+    );
+
+  updateAccountUI();
+
+  renderNeeds();
+  renderMessages();
+  renderChecklist();
+
+  if (map) {
+    renderReports();
+  }
+
+  updateSelectedLocationText();
+
+}
+
+document
+  .getElementById("langBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      state.lang =
+        state.lang === "en"
+          ? "fil"
+          : "en";
+
+      localStorage.setItem(
+        "fl_lang",
+        state.lang
+      );
+
+      translatePage();
+
+    }
+  );
+
+/* =====================================================
+   LOGIN / ACCOUNT
+===================================================== */
+
+const avatar =
+  document.getElementById("avatar");
+
+const accountPanel =
+  document.getElementById(
+    "accountPanel"
+  );
+
+const accountName =
+  document.getElementById(
+    "accountName"
+  );
+
+const accountEmail =
+  document.getElementById(
+    "accountEmail"
+  );
+
+const accountAction =
+  document.getElementById(
+    "accountAction"
+  );
+
+avatar.addEventListener(
+  "click",
+  event => {
+
+    event.stopPropagation();
+
+    accountPanel.classList.toggle(
+      "open"
+    );
+
+  }
+);
+
+document.addEventListener(
+  "click",
+  event => {
+
+    if (
+      !event.target.closest(".user-menu")
+    ) {
+
+      accountPanel.classList.remove(
+        "open"
+      );
+
+    }
+
+  }
+);
+
+function updateAccountUI() {
+
+  if (state.user) {
+
+    const firstLetter =
+      (
+        state.user.name ||
+        state.profile.name ||
+        "B"
+      )
+      .slice(0,1)
+      .toUpperCase();
+
+    avatar.textContent =
+      firstLetter;
+
+    accountName.textContent =
+      state.user.name ||
+      state.profile.name ||
+      t("accountLoggedIn");
+
+    accountEmail.textContent =
+      state.user.email;
+
+    accountAction.textContent =
+      t("logout");
+
+  } else {
+
+    avatar.textContent = "B";
+
+    accountName.textContent =
+      t("guest");
+
+    accountEmail.textContent =
+      t("notLoggedIn");
+
+    accountAction.textContent =
+      t("login");
+
+  }
+
+}
+
+accountAction.addEventListener(
+  "click",
+  () => {
+
+    accountPanel.classList.remove(
+      "open"
+    );
+
+    if (state.user) {
+
+      state.user = null;
+
+      localStorage.removeItem(
+        "fl_user"
+      );
+
+      updateAccountUI();
+
+      showToast(t("loggedOut"));
+
+    } else {
+
+      openModal("loginModal");
+
+    }
+
+  }
+);
+
+document
+  .getElementById("loginForm")
+  .addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+      const email =
+        document
+          .getElementById(
+            "loginEmail"
+          )
+          .value
+          .trim()
+          .toLowerCase();
+
+      const password =
+        document
+          .getElementById(
+            "loginPassword"
+          )
+          .value;
+
+      if (
+        !email ||
+        !email.includes("@") ||
+        password.length < 4
+      ) {
+
+        showToast(t("invalidLogin"));
+
+        return;
+
+      }
+
+      /*
+        Front-end demo authentication.
+
+        This intentionally stores only a demo session.
+        A real application should authenticate through
+        a backend provider instead.
+      */
+
+      state.user = {
+
+        email,
+
+        name:
+          state.profile.owner ||
+          state.profile.name ||
+          email.split("@")[0],
+
+        loggedInAt:
+          new Date().toISOString()
+
+      };
+
+      localStorage.setItem(
+        "fl_user",
+        JSON.stringify(state.user)
+      );
+
+      updateAccountUI();
+
+      closeModal("loginModal");
+
+      event.target.reset();
+
+      showToast(t("loggedIn"));
+
+    }
+  );
+
+/* =====================================================
+   HTML ESCAPING
+===================================================== */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    character => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    })[character]
+  );
+
+}
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+renderNeeds();
+renderMessages();
+renderChecklist();
+renderProfile();
+updateStats();
+translatePage();
+updateAccountUI();
+
+</script>
+
+</body>
+</html>
